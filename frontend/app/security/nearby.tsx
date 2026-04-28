@@ -97,10 +97,17 @@ export default function SecurityNearby() {
       
       setNearbyUsers(response.data.nearby_users || []);
       setMyRadius(response.data.your_radius_km || 25);
-      setMyLocation(response.data.your_location?.coordinates ? {
-        longitude: response.data.your_location.coordinates[0],
-        latitude: response.data.your_location.coordinates[1]
-      } : null);
+      // FIX: Only update myLocation from the API response if the server returns
+      // valid coordinates. If your_location is missing/null (e.g. the update
+      // hasn't propagated yet), we keep the GPS-acquired coords that
+      // updateMyLocation() already set — preventing the null→coords→null flicker
+      // that caused the location bar and map to appear and disappear.
+      if (response.data.your_location?.coordinates) {
+        setMyLocation({
+          longitude: response.data.your_location.coordinates[0],
+          latitude: response.data.your_location.coordinates[1],
+        });
+      }
     } catch (error: any) {
       if (error?.response?.status === 401) {
         await clearAuthData();
