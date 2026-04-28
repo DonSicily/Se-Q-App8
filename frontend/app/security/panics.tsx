@@ -320,26 +320,19 @@ export default function SecurityPanics() {
         { to_user_id: otherUserId },
         { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
       );
-      const convId    = startRes.data?.conversation_id;
-      const isNewConv = startRes.data?.existing === false;
+      const convId = startRes.data?.conversation_id;
 
       const cat = panicItem.emergency_category || 'emergency';
       const lat = panicItem.latitude?.toFixed(4) ?? '?';
       const lng = panicItem.longitude?.toFixed(4) ?? '?';
 
-      // Determine whether to send the preset opening message:
-      // Always send if conversation is brand new.
-      // Also send if the conversation exists but has no messages yet.
-      let shouldSendPreset = isNewConv;
-      if (!shouldSendPreset && convId) {
-        try {
-          const check = await axios.get(
-            `${BACKEND_URL}/api/chat/${convId}/messages`,
-            { headers: { Authorization: `Bearer ${token}` }, timeout: 8000 }
-          );
-          shouldSendPreset = (check.data?.messages || []).length === 0;
-        } catch (_) { shouldSendPreset = true; }
-      }
+      // FIX: Always send the preset SITREP message when a security officer
+      // responds to a panic via "Message In-App". The previous logic only sent
+      // the message for brand-new conversations or empty ones — so a user who
+      // had already been messaged in a prior panic would never receive a new
+      // auto-response. Since this action is always triggered by a fresh panic
+      // event, a new response message must always be dispatched.
+      const shouldSendPreset = true;
 
       if (shouldSendPreset) {
         const PRESET_MSG =
