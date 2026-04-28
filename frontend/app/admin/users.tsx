@@ -154,11 +154,20 @@ export default function AdminUsers() {
     );
   };
 
-  const filteredUsers = users.filter(u =>
-    u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.phone?.includes(searchQuery)
-  );
+  // FIX: Apply role filter client-side in addition to the API query parameter.
+  // Previously only the search query was applied locally, so if the backend
+  // returned more users than expected (or the filter param was silently ignored),
+  // the wrong roles would still appear in the list. Applying the role check here
+  // guarantees the "Admin" tab always shows only admin accounts.
+  const filteredUsers = users.filter(u => {
+    const matchesRole = !roleFilter || u.role === roleFilter;
+    const matchesSearch = !searchQuery || (
+      u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.phone?.includes(searchQuery)
+    );
+    return matchesRole && matchesSearch;
+  });
 
   const renderUser = ({ item }: any) => {
     const isDeleting = deletingId === item.id;
