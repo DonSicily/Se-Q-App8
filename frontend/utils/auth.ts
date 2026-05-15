@@ -6,7 +6,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+<<<<<<< HEAD
 import { Audio } from 'expo-av';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 const AUTH_TOKEN_KEY = 'auth_token';
 const USER_ID_KEY    = 'user_id';
@@ -87,6 +90,7 @@ export const clearAuthData = async (): Promise<boolean> => {
   try {
     const token = await getAuthToken();
 
+<<<<<<< HEAD
     // CRITICAL: Reset audio session to clean state BEFORE clearing auth
     // This prevents audio mode persistence that causes sound clashes on re-login
     try {
@@ -102,6 +106,8 @@ export const clearAuthData = async (): Promise<boolean> => {
       console.log('[Auth] Audio session reset on logout');
     } catch (_) {}
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     if (token) {
       const { default: axios }       = await import('axios');
       const { default: BACKEND_URL } = await import('./config');

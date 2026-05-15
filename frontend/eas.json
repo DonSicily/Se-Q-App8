@@ -1,5 +1,6 @@
 {
   "cli": {
+<<<<<<< HEAD
     "version": ">= 15.0.0"
   },
   "build": {
@@ -12,10 +13,27 @@
         "NODE_ENV": "production",
         "EXPO_USE_FAST_RESOLVER": "1",
         "MAPBOX_ACCESS_TOKEN": "YOUR_MAPBOX_TOKEN_HERE"
+=======
+    "version": ">= 5.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "remote"
+      },
+      "credentialsSource": "remote",
+      "withoutCredentials": true,
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://se-q-app8-production.up.railway.app"
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       }
     },
     "production": {
       "android": {
+<<<<<<< HEAD
         "buildType": "apk"
       },
       "env": {
@@ -46,10 +64,20 @@
       "env": {
         "CI": "1",
         "EXPO_USE_FAST_RESOLVER": "1"
+=======
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://se-q-app8-production.up.railway.app"
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       }
     }
   },
   "submit": {
     "production": {}
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3

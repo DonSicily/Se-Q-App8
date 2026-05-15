@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+<<<<<<< HEAD
 import {
   View, Text, TouchableOpacity, StyleSheet, TextInput, Alert,
+=======
+import { 
+  View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, 
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   ActivityIndicator, Switch, Animated, Dimensions,
   Modal, KeyboardAvoidingView, Platform
 } from 'react-native';
@@ -8,7 +13,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraView } from 'expo-camera';
+<<<<<<< HEAD
 import { Audio } from 'expo-av';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import * as Location from 'expo-location';
 import axios from 'axios';
 import NetInfo from '@react-native-community/netinfo';
@@ -16,7 +24,10 @@ import Slider from '@react-native-community/slider';
 import { getAuthToken } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
 import { addToQueue } from '../../utils/offlineQueue';
+<<<<<<< HEAD
 import { setRecordingAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 const MIN_RECORDING_DURATION = 2;
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -44,6 +55,7 @@ export default function VideoReport() {
   // KEY FIX: only mount CameraView when this screen is focused
   const [cameraActive, setCameraActive] = useState(false);
 
+<<<<<<< HEAD
   // Restores the shared audio session to playback defaults.
   // CameraView.recordAsync() acquires the mic/audio session; without this call
   // after recording ends (or when the screen blurs), allowsRecordingIOS stays
@@ -53,17 +65,24 @@ export default function VideoReport() {
     restorePlaybackAudioMode();
   }, []);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   useFocusEffect(
     useCallback(() => {
       setCameraActive(true);
       return () => {
         setCameraActive(false);
         setCameraReady(false);
+<<<<<<< HEAD
         // Restore audio session whenever this screen loses focus —
         // covers back-navigation, tab-switch, and screen-stack changes.
         restoreAudioMode();
       };
     }, [restoreAudioMode])
+=======
+      };
+    }, [])
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   );
 
   const recordingPromiseRef  = useRef<Promise<any> | null>(null);
@@ -130,7 +149,10 @@ export default function VideoReport() {
       } catch (_) {}
       await new Promise(resolve => setTimeout(resolve, 200));
     }
+<<<<<<< HEAD
     restoreAudioMode();
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     router.back();
   };
 
@@ -184,8 +206,11 @@ export default function VideoReport() {
       setRecordingStartTime(null);
       recordingPromiseRef.current = null;
       actualStartTimeRef.current  = 0;
+<<<<<<< HEAD
       // Restore audio session — CameraView held the mic; release it now.
       restoreAudioMode();
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     }
   };
 
@@ -211,6 +236,7 @@ export default function VideoReport() {
   };
 
   /**
+<<<<<<< HEAD
    * Camera flip — continues recording through the lens switch.
    *
    * expo-camera's native recording session stays alive when the `facing` prop
@@ -223,6 +249,24 @@ export default function VideoReport() {
    * which is what caused the recording to end on every camera switch.
    */
   const toggleFacing = () => {
+=======
+   * AMENDMENT 1 — Camera flip functional during recording.
+   * If a recording is in progress we gracefully stop it first (the video
+   * captured so far is preserved), then flip the camera so the user can
+   * immediately start a new recording from the opposite lens.
+   */
+  const toggleFacing = async () => {
+    if (isRecording) {
+      // Gracefully stop the current recording before flipping.
+      // The existing startRecording flow will catch the resolved video URI
+      // and surface the caption modal with the recorded segment.
+      try {
+        if (cameraRef.current) await cameraRef.current.stopRecording();
+      } catch (_) {}
+      // Brief pause so CameraView settles before prop change
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     setFacing(c => c === 'back' ? 'front' : 'back');
   };
 

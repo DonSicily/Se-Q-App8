@@ -12,6 +12,7 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # Add any project specific keep options here:
+<<<<<<< HEAD
 
 # React Native
 -keep class com.facebook.react.** { *; }
@@ -28,3 +29,5 @@
 # Keep React Native views
 -keep class com.facebook.react.views.** { *; }
 -keep class com.facebook.react.uimanager.** { *; }
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3

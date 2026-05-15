@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator, Image } from 'react-native';
+=======
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator } from 'react-native';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -105,11 +109,15 @@ export default function Register() {
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <View style={styles.logoContainer}>
+<<<<<<< HEAD
               <Image
                 source={require('../../assets/images/login-logo.png')}
                 style={styles.logoImage}
                 resizeMode="contain"
               />
+=======
+              <Text style={styles.logoText}>Se-Q</Text>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             </View>
             <Text style={styles.subtitle}>Create Your Account</Text>
           </View>
@@ -209,8 +217,13 @@ const styles = StyleSheet.create({
   keyboardView:         { flex: 1 },
   scrollContent:        { flexGrow: 1, paddingHorizontal: 24, paddingVertical: 20 },
   header:               { alignItems: 'center', marginBottom: 32 },
+<<<<<<< HEAD
   logoContainer:        { marginBottom: 8, paddingHorizontal: 16, paddingVertical: 6, alignItems: 'center' },
   logoImage:            { width: 180, height: 72 },
+=======
+  logoContainer:        { marginBottom: 8, paddingHorizontal: 16, paddingVertical: 6 },
+  logoText:             { fontSize: 52, fontWeight: '900', color: '#fff', letterSpacing: 4, fontStyle: 'italic' },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   subtitle:             { fontSize: 16, color: '#94A3B8', marginTop: 8 },
   form:                 { width: '100%' },
   label:                { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 12, marginTop: 8 },

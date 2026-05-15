@@ -1,14 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, Image, Modal } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+=======
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert, ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Image, Modal, Switch } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+<<<<<<< HEAD
 import { getAuthToken, clearAuthData } from '../utils/auth';
 import BACKEND_URL from '../utils/config';
 
+=======
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuthToken, clearAuthData, getUserMetadata } from '../utils/auth';
+import BACKEND_URL from '../utils/config';
+
+
+const ICON_OPTIONS = ['shield', 'shield-checkmark', 'lock-closed', 'lock-open', 'key', 'finger-print', 'eye', 'eye-off', 'pulse', 'heart', 'flash', 'star', 'moon', 'sunny', 'cloudy', 'rainy', 'snow', 'thunderstorm', 'partly-sunny', 'water', 'flame', 'leaf', 'flower', 'paw', 'bug', 'airplane', 'car', 'bicycle', 'boat', 'bus', 'rocket', 'train', 'walk', 'fitness', 'basketball', 'football', 'baseball', 'golf', 'tennisball', 'trophy', 'medal', 'ribbon', 'rose', 'earth', 'globe', 'map', 'location', 'navigate', 'compass', 'pin', 'home', 'business', 'school', 'library', 'briefcase', 'calendar', 'time', 'alarm', 'stopwatch', 'timer', 'notifications', 'chatbubble', 'mail', 'call', 'videocam', 'camera', 'mic', 'musical-notes', 'volume-high', 'headset', 'cart', 'bag', 'pricetag', 'card', 'cash', 'gift', 'balloon', 'cafe', 'pizza', 'beer', 'wine', 'ice-cream', 'nutrition', 'restaurant', 'fast-food', 'book', 'newspaper', 'bookmark', 'document', 'folder', 'calculator', 'clipboard', 'create', 'pencil', 'brush', 'color-palette', 'image', 'images', 'aperture', 'barcode'];
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 interface EmergencyContact {
   name: string;
   phone: string;
@@ -20,6 +37,12 @@ export default function Settings() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+<<<<<<< HEAD
+=======
+  const [appName, setAppName] = useState('Se-Q');
+  const [selectedIcon, setSelectedIcon] = useState('shield');
+  const [showIconPicker, setShowIconPicker] = useState(false);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const [userProfile, setUserProfile] = useState<any>(null);
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([
     { name: '', phone: '', email: '' },
@@ -29,6 +52,10 @@ export default function Settings() {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+<<<<<<< HEAD
+=======
+  // AMENDMENT 4: msgSoundEnabled removed — notifications are disabled.
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const cameraRef = React.useRef<CameraView>(null);
 
   useEffect(() => {
@@ -50,16 +77,42 @@ export default function Settings() {
     try {
       const token = await getAuthToken();
       if (!token) return;
+<<<<<<< HEAD
+=======
+
+      // Load local customization first for instant display
+      try {
+        const localCustomization = await AsyncStorage.getItem('app_customization');
+        if (localCustomization) {
+          const { app_name, app_logo } = JSON.parse(localCustomization);
+          if (app_name) setAppName(app_name);
+          if (app_logo) setSelectedIcon(app_logo);
+        }
+      } catch (e) {}
+      
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       const response = await axios.get(`${BACKEND_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 10000
       });
       console.log('[Settings] Profile loaded');
       setUserProfile(response.data);
+<<<<<<< HEAD
       if (response.data.profile_photo_url) {
         const photoUrl = response.data.profile_photo_url;
         setProfilePhoto(photoUrl.startsWith('http') ? photoUrl : `${BACKEND_URL}${photoUrl}`);
       }
+=======
+      setAppName(response.data.app_name || 'Se-Q');
+      setSelectedIcon(response.data.app_logo || 'shield');
+      if (response.data.profile_photo_url) {
+        const photoUrl = response.data.profile_photo_url;
+        // Prepend backend URL if it's a relative path
+        setProfilePhoto(photoUrl.startsWith('http') ? photoUrl : `${BACKEND_URL}${photoUrl}`);
+      }
+      
+      // Load emergency contacts
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       if (response.data.emergency_contacts && response.data.emergency_contacts.length > 0) {
         const contacts = [...response.data.emergency_contacts];
         while (contacts.length < 2) {
@@ -100,6 +153,7 @@ export default function Settings() {
             return;
           }
           const result = await ImagePicker.launchImageLibraryAsync({
+<<<<<<< HEAD
             mediaTypes: ['images'] as any,
             allowsEditing: true,
             aspect: [1, 1],
@@ -111,6 +165,18 @@ export default function Settings() {
               ? asset.mimeType
               : 'image/jpeg';
             await uploadPhotoUri(asset.uri, mime);
+=======
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1] as [number, number],
+            quality: 0.7,
+          });
+          if (!result.canceled && result.assets[0]?.uri) {
+            await uploadPhotoUri(
+              result.assets[0].uri,
+              result.assets[0].mimeType || 'image/jpeg'
+            );
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           }
         },
       },
@@ -124,6 +190,7 @@ export default function Settings() {
       const token = await getAuthToken();
       if (!token) { router.replace('/auth/login'); return; }
 
+<<<<<<< HEAD
       let base64: string;
       if (Platform.OS === 'web') {
         // Web: fetch as blob and convert to base64
@@ -147,6 +214,12 @@ export default function Settings() {
           encoding: FS.EncodingType.Base64,
         });
       }
+=======
+      // Read file as base64 - more reliable across platforms
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
       // Use JSON body with base64 - avoids multipart issues on web/mobile
       const response = await axios.post(
@@ -191,6 +264,49 @@ export default function Settings() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const saveCustomization = async () => {
+    if (!appName.trim()) {
+      Alert.alert('Error', 'App name cannot be empty');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        router.replace('/auth/login');
+        return;
+      }
+      
+      await axios.put(`${BACKEND_URL}/api/user/customize-app`, {
+        app_name: appName,
+        app_logo: selectedIcon
+      }, { 
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 10000
+      });
+
+      // Persist locally so the app header updates immediately
+      await AsyncStorage.setItem('app_customization', JSON.stringify({ app_name: appName, app_logo: selectedIcon }));
+
+      Alert.alert('Success', `App customization saved! The app will now appear as "${appName}".`);
+    } catch (error: any) {
+      console.error('[Settings] Save error:', error?.response?.data);
+      if (error?.response?.status === 401) {
+        Alert.alert('Session Expired', 'Please login again');
+        await clearAuthData();
+        router.replace('/auth/login');
+      } else {
+        Alert.alert('Error', 'Failed to save customization');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const updateEmergencyContact = (index: number, field: keyof EmergencyContact, value: string) => {
     const newContacts = [...emergencyContacts];
     newContacts[index] = { ...newContacts[index], [field]: value };
@@ -198,11 +314,19 @@ export default function Settings() {
   };
 
   const saveEmergencyContacts = async () => {
+<<<<<<< HEAD
+=======
+    // Validate at least one contact has phone number
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     const validContacts = emergencyContacts.filter(c => c.phone.trim() !== '');
     if (validContacts.length === 0) {
       Alert.alert('Error', 'Please add at least one emergency contact with phone number');
       return;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     setSavingContacts(true);
     try {
       const token = await getAuthToken();
@@ -210,12 +334,23 @@ export default function Settings() {
         router.replace('/auth/login');
         return;
       }
+<<<<<<< HEAD
       await axios.put(`${BACKEND_URL}/api/user/emergency-contacts`, {
         contacts: emergencyContacts.filter(c => c.phone.trim() !== '')
       }, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 10000
       });
+=======
+      
+      await axios.put(`${BACKEND_URL}/api/user/emergency-contacts`, {
+        contacts: emergencyContacts.filter(c => c.phone.trim() !== '')
+      }, { 
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 10000
+      });
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       Alert.alert('Success', 'Emergency contacts saved. They will be notified during panic events.');
     } catch (error: any) {
       console.error('[Settings] Save contacts error:', error?.response?.data);
@@ -237,7 +372,11 @@ export default function Settings() {
 
   return (
     <SafeAreaView style={styles.container}>
+<<<<<<< HEAD
       <KeyboardAvoidingView
+=======
+      <KeyboardAvoidingView 
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
@@ -248,6 +387,7 @@ export default function Settings() {
           <Text style={styles.title}>Settings</Text>
           <View style={{ width: 24 }} />
         </View>
+<<<<<<< HEAD
         <ScrollView style={styles.content}>
           {/* Profile Photo Upload Section - TOP OF PAGE */}
           <View style={styles.profilePhotoSection}>
@@ -274,11 +414,28 @@ export default function Settings() {
             </Text>
           </View>
 
+=======
+
+        <ScrollView style={styles.content}>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           {/* User Profile Section */}
           {userProfile && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Your Profile</Text>
               <View style={styles.profileCard}>
+<<<<<<< HEAD
+=======
+                <TouchableOpacity style={styles.profileAvatar} onPress={pickAndUploadPhoto} disabled={uploadingPhoto}>
+                  {profilePhoto ? (
+                    <Image source={{ uri: profilePhoto }} style={styles.profileAvatarImage} />
+                  ) : (
+                    <Ionicons name="person" size={40} color="#3B82F6" />
+                  )}
+                  <View style={styles.photoEditBadge}>
+                    {uploadingPhoto ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="camera" size={12} color="#fff" />}
+                  </View>
+                </TouchableOpacity>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 <View style={styles.profileInfo}>
                   <Text style={styles.profileName}>{userProfile.full_name || 'User'}</Text>
                   <Text style={styles.profileEmail}>{userProfile.email}</Text>
@@ -295,13 +452,77 @@ export default function Settings() {
             </View>
           )}
 
+<<<<<<< HEAD
+=======
+          {/* App Customization Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>App Customization</Text>
+            <Text style={styles.sectionDescription}>Disguise the app name and icon. The custom name will show as the app title and in your phone's app launcher if the device supports dynamic shortcuts.</Text>
+
+            <View style={styles.customizationCard}>
+              <Text style={styles.inputLabel}>App Name</Text>
+              <TextInput
+                style={styles.input}
+                value={appName}
+                onChangeText={setAppName}
+                placeholder="Enter app name"
+                placeholderTextColor="#64748B"
+              />
+
+              <Text style={styles.inputLabel}>App Icon</Text>
+              <TouchableOpacity style={styles.iconSelector} onPress={() => setShowIconPicker(!showIconPicker)}>
+                <View style={styles.selectedIconContainer}>
+                  <Ionicons name={selectedIcon as any} size={32} color="#3B82F6" />
+                </View>
+                <Text style={styles.iconSelectorText}>Tap to change icon</Text>
+                <Ionicons name={showIconPicker ? 'chevron-up' : 'chevron-down'} size={24} color="#64748B" />
+              </TouchableOpacity>
+
+              {showIconPicker && (
+                <View style={styles.iconGrid}>
+                  <FlatList
+                    data={ICON_OPTIONS.slice(0, 40)}
+                    numColumns={6}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={[styles.iconOption, selectedIcon === item && styles.iconOptionSelected]}
+                        onPress={() => { setSelectedIcon(item); setShowIconPicker(false); }}
+                      >
+                        <Ionicons name={item as any} size={24} color={selectedIcon === item ? '#3B82F6' : '#94A3B8'} />
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
+              )}
+
+              <TouchableOpacity style={styles.saveButton} onPress={saveCustomization} disabled={loading}>
+                {loading ? <ActivityIndicator color="#fff" /> : (
+                  <>
+                    <Ionicons name="save" size={20} color="#fff" />
+                    <Text style={styles.saveButtonText}>Save Customization</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           {/* Emergency Contacts Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Emergency Contacts</Text>
             <Text style={styles.sectionDescription}>These contacts will be notified via SMS during panic events</Text>
+<<<<<<< HEAD
             {emergencyContacts.map((contact, index) => (
               <View key={index} style={styles.contactCard}>
                 <Text style={styles.contactHeader}>Contact {index + 1}</Text>
+=======
+
+            {emergencyContacts.map((contact, index) => (
+              <View key={index} style={styles.contactCard}>
+                <Text style={styles.contactHeader}>Contact {index + 1}</Text>
+                
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 <Text style={styles.inputLabel}>Name</Text>
                 <TextInput
                   style={styles.input}
@@ -310,6 +531,10 @@ export default function Settings() {
                   placeholder="Contact name"
                   placeholderTextColor="#64748B"
                 />
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 <Text style={styles.inputLabel}>Phone Number *</Text>
                 <TextInput
                   style={styles.input}
@@ -319,6 +544,10 @@ export default function Settings() {
                   placeholderTextColor="#64748B"
                   keyboardType="phone-pad"
                 />
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 <Text style={styles.inputLabel}>Email (Optional)</Text>
                 <TextInput
                   style={styles.input}
@@ -331,12 +560,20 @@ export default function Settings() {
                 />
               </View>
             ))}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             <View style={styles.smsPreview}>
               <Text style={styles.smsPreviewTitle}>📱 SMS Preview:</Text>
               <Text style={styles.smsPreviewText}>
                 Hello {emergencyContacts[0]?.name || '[Contact Name]'}, Kindly reach-out to your {userProfile?.full_name || '[User Name]'} - {userProfile?.phone || '[User Phone]'} who has activated a Panic Emergency. Thanks{"\n\n"}- Se-Q Securities
               </Text>
             </View>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             <TouchableOpacity style={styles.saveContactsButton} onPress={saveEmergencyContacts} disabled={savingContacts}>
               {savingContacts ? <ActivityIndicator color="#fff" /> : (
                 <>
@@ -347,6 +584,12 @@ export default function Settings() {
             </TouchableOpacity>
           </View>
 
+<<<<<<< HEAD
+=======
+          {/* AMENDMENT 4: Notifications & Alerts section removed.
+              The app is of discrete use — no notification settings are exposed. */}
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           {/* Quick Emergency Numbers */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Emergency Services</Text>
@@ -391,6 +634,10 @@ export default function Settings() {
               <Text style={styles.aboutDescription}>Your personal safety companion</Text>
             </View>
           </View>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -420,6 +667,10 @@ export default function Settings() {
           </CameraView>
         </View>
       </Modal>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     </SafeAreaView>
   );
 }
@@ -443,8 +694,21 @@ const styles = StyleSheet.create({
   premiumActive: { backgroundColor: '#F59E0B20' },
   premiumInactive: { backgroundColor: '#64748B20' },
   premiumText: { fontSize: 12, fontWeight: '600', color: '#F59E0B' },
+<<<<<<< HEAD
   inputLabel: { fontSize: 14, color: '#94A3B8', marginBottom: 8, marginTop: 16 },
   input: { backgroundColor: '#0F172A', borderRadius: 12, padding: 16, color: '#fff', fontSize: 16 },
+=======
+  customizationCard: { backgroundColor: '#1E293B', borderRadius: 16, padding: 20 },
+  inputLabel: { fontSize: 14, color: '#94A3B8', marginBottom: 8, marginTop: 16 },
+  input: { backgroundColor: '#0F172A', borderRadius: 12, padding: 16, color: '#fff', fontSize: 16 },
+  iconSelector: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0F172A', borderRadius: 12, padding: 16 },
+  selectedIconContainer: { width: 48, height: 48, borderRadius: 12, backgroundColor: '#3B82F620', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  iconSelectorText: { flex: 1, color: '#94A3B8', fontSize: 14 },
+  iconGrid: { marginTop: 12, backgroundColor: '#0F172A', borderRadius: 12, padding: 12 },
+  iconOption: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 8, margin: 2 },
+  iconOptionSelected: { backgroundColor: '#3B82F620' },
+  saveButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#3B82F6', paddingVertical: 14, borderRadius: 12, marginTop: 20 },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   saveButtonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
   contactCard: { backgroundColor: '#1E293B', borderRadius: 16, padding: 20, marginBottom: 16 },
   contactHeader: { fontSize: 16, fontWeight: '600', color: '#3B82F6', marginBottom: 8 },
@@ -464,6 +728,10 @@ const styles = StyleSheet.create({
   aboutDescription: { fontSize: 14, color: '#94A3B8', textAlign: 'center', marginTop: 8 },
   profileAvatarImage: { width: 70, height: 70, borderRadius: 35 },
   photoEditBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#3B82F6', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center' },
+<<<<<<< HEAD
+=======
+  // AMENDMENT 4: notif* styles removed — notification settings section removed.
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // Camera modal
   cameraModal: { flex: 1, backgroundColor: '#000' },
   cameraView: { flex: 1 },
@@ -477,6 +745,7 @@ const styles = StyleSheet.create({
   cameraBottom: { alignItems: 'center', paddingBottom: 60, backgroundColor: 'rgba(0,0,0,0.4)' },
   captureBtn: { width: 80, height: 80, borderRadius: 40, borderWidth: 4, borderColor: '#fff', justifyContent: 'center', alignItems: 'center' },
   captureBtnInner: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff' },
+<<<<<<< HEAD
   // Profile Photo Section - TOP OF PAGE
   profilePhotoSection: { alignItems: 'center', backgroundColor: '#1E293B', borderRadius: 20, padding: 24, marginBottom: 24 },
   profilePhotoTitle: { fontSize: 20, fontWeight: '600', color: '#fff', marginBottom: 8 },
@@ -486,4 +755,6 @@ const styles = StyleSheet.create({
   profilePhotoPlaceholder: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#3B82F6', borderStyle: 'dashed' },
   profilePhotoUploadBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#3B82F6', borderRadius: 16, width: 32, height: 32, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#1E293B' },
   profilePhotoHint: { fontSize: 14, color: '#64748B', marginTop: 12 },
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 });

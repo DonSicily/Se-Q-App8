@@ -18,18 +18,27 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
+<<<<<<< HEAD
   ActivityIndicator, Alert, RefreshControl, Linking, Platform, Image,
+=======
+  ActivityIndicator, Alert, RefreshControl, Linking, Platform,
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+<<<<<<< HEAD
 import { Audio } from 'expo-av';
 import { WebView } from 'react-native-webview';
+=======
+import { Audio, Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { getAuthToken, clearAuthData, getUserMetadata } from '../../utils/auth';
 import { LocationMapModal } from '../../components/LocationMapModal';
 import BACKEND_URL from '../../utils/config';
 
+<<<<<<< HEAD
 // ─── WebView video helper ─────────────────────────────────────────────────────
 // expo-av 16 Video component crashes on RN 0.83 / SDK 55:
 // ViewUtils.tryRunWithVideoViewOnUiThread → UIManager.resolveView(int) removed
@@ -77,6 +86,8 @@ const buildVideoHtml = (url: string, allowDownload: boolean = false): string => 
 };
 
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 export default function SecurityReports() {
   const router = useRouter();
@@ -97,7 +108,11 @@ export default function SecurityReports() {
   // ── Standardised video player state (mirrors admin/reports.tsx) ──────────
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
   const [videoStatus,      setVideoStatus]      = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+<<<<<<< HEAD
   // videoRef removed — expo-av Video replaced with WebView (NoSuchMethodError fix)
+=======
+  const videoRef = useRef<Video>(null);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   useFocusEffect(
     useCallback(() => {
@@ -253,6 +268,7 @@ export default function SecurityReports() {
       <View style={styles.reportCard}>
         <View style={styles.reportHeader}>
           <View style={styles.reportIcon}>
+<<<<<<< HEAD
             {item.user_photo_url ? (
               <Image source={{ uri: item.user_photo_url }} style={styles.reportUserAvatar} />
             ) : (
@@ -262,6 +278,13 @@ export default function SecurityReports() {
                 color={item.type === 'video' ? '#10B981' : '#8B5CF6'}
               />
             )}
+=======
+            <Ionicons
+              name={item.type === 'video' ? 'videocam' : 'mic'}
+              size={28}
+              color={item.type === 'video' ? '#10B981' : '#8B5CF6'}
+            />
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           </View>
           <View style={styles.reportInfo}>
             <Text style={styles.reportType}>{item.type?.toUpperCase()} REPORT</Text>
@@ -352,6 +375,10 @@ export default function SecurityReports() {
     const resolvedVideoUrl = resolveMediaUrl(selectedVideoUrl);
 
     const closePlayer = () => {
+<<<<<<< HEAD
+=======
+      videoRef.current?.pauseAsync().catch(() => {});
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       setSelectedVideoUrl(null);
       setVideoStatus('idle');
     };
@@ -369,6 +396,7 @@ export default function SecurityReports() {
         {/* ── Standardised 16:9 wrapper with loading / error overlays ── */}
         <View style={styles.videoScreenCenter}>
           <View style={styles.videoWrapper}>
+<<<<<<< HEAD
             <WebView
               originWhitelist={['*']}
               source={{ html: buildVideoHtml(resolvedVideoUrl), baseUrl: '' }}
@@ -384,6 +412,34 @@ export default function SecurityReports() {
                 const msg = e.nativeEvent.data;
                 if (msg === 'ready' || msg === 'ended') setVideoStatus('ready');
                 if (msg === 'error') setVideoStatus('error');
+=======
+            <Video
+              ref={videoRef}
+              source={{
+                uri: resolvedVideoUrl,
+                headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
+              }}
+              style={styles.videoPlayer}
+              useNativeControls
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay={false}
+              isLooping={false}
+              onLoadStart={() => setVideoStatus('loading')}
+              onLoad={() => setVideoStatus('ready')}
+              onPlaybackStatusUpdate={(status: AVPlaybackStatus) => {
+                if (!status.isLoaded) return;
+                if (videoStatus === 'loading') setVideoStatus('ready');
+                // Mirrors admin: pause first, then rewind — prevents auto-resume loop
+                if (status.didJustFinish) {
+                  videoRef.current?.pauseAsync().catch(() => {}).finally(() => {
+                    videoRef.current?.setPositionAsync(0).catch(() => {});
+                  });
+                }
+              }}
+              onError={(err) => {
+                console.error('[SecurityVideoPlayer] Error:', JSON.stringify(err));
+                setVideoStatus('error');
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
               }}
             />
 
@@ -469,7 +525,10 @@ const styles = StyleSheet.create({
   reportCard:         { backgroundColor: '#1E293B', borderRadius: 16, padding: 16, marginBottom: 12 },
   reportHeader:       { flexDirection: 'row', alignItems: 'flex-start' },
   reportIcon:         { width: 50, height: 50, borderRadius: 12, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+<<<<<<< HEAD
   reportUserAvatar:   { width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: '#3B82F6' },
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   reportInfo:         { flex: 1 },
   reportType:         { fontSize: 14, fontWeight: '700', color: '#fff', marginBottom: 4 },
   reportSender:       { fontSize: 14, color: '#94A3B8', marginBottom: 2 },

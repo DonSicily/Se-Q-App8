@@ -1,11 +1,16 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Body, Query, Request, File, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
+<<<<<<< HEAD
 from fastapi.middleware.gzip import GZipMiddleware
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+=======
+from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
 import os
@@ -22,9 +27,12 @@ import math
 import hashlib
 import base64
 
+<<<<<<< HEAD
 # Rate limiter - uses client IP address
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 # Safe imports with fallbacks
 try:
     from video_transcoder import transcode_queue, check_ffmpeg_available, transcode_video_async
@@ -70,9 +78,13 @@ async def create_indexes():
     except Exception as e:
         logger.error(f"Failed to create indexes: {e}")
 
+<<<<<<< HEAD
 JWT_SECRET = os.environ.get('JWT_SECRET')
 if not JWT_SECRET:
     raise ValueError("JWT_SECRET environment variable is required - do not use fallback secrets in production")
+=======
+JWT_SECRET = os.environ.get('JWT_SECRET', 'safeguard-secret-key-2025')
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION_HOURS = 24 * 30
 
@@ -95,6 +107,7 @@ async def lifespan(app: FastAPI):
     client.close()
 
 app = FastAPI(lifespan=lifespan)
+<<<<<<< HEAD
 
 # Add rate limiter state to app
 app.state.limiter = limiter
@@ -103,6 +116,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Add GZip compression for faster responses
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 api_router = APIRouter(prefix="/api")
 
 # ================== PUBLIC HEALTH ENDPOINTS (NO AUTH) ==================
@@ -269,7 +284,10 @@ async def _log_admin_action(admin_id: str, action: str, target: str, target_id: 
 
 # ================== AUTH ROUTES ==================
 @api_router.post("/auth/login")
+<<<<<<< HEAD
 @limiter.limit("10/minute")  # Strict rate limit to prevent brute force
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 async def login(req: LoginRequest):
     """Regular login for civil and security users"""
     user = await db.users.find_one({"email": req.email.strip().lower()})
@@ -277,9 +295,15 @@ async def login(req: LoginRequest):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     if not user.get("is_active", True):
         raise HTTPException(status_code=403, detail="Account disabled")
+<<<<<<< HEAD
 
     token = create_token(str(user["_id"]), user["email"], user.get("role", "civil"))
 
+=======
+    
+    token = create_token(str(user["_id"]), user["email"], user.get("role", "civil"))
+    
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     return {
         "token": token,
         "user_id": str(user["_id"]),
@@ -291,6 +315,7 @@ async def login(req: LoginRequest):
     }
 
 @api_router.post("/admin/login")
+<<<<<<< HEAD
 @limiter.limit("10/minute")  # Strict rate limit to prevent brute force
 async def admin_login(req: LoginRequest):
     """Admin-specific login endpoint - ONLY for admin panel"""
@@ -310,6 +335,26 @@ async def admin_login(req: LoginRequest):
 
     token = create_token(str(user["_id"]), user["email"], "admin")
 
+=======
+async def admin_login(req: LoginRequest):
+    """Admin-specific login endpoint - ONLY for admin panel"""
+    user = await db.users.find_one({"email": req.email.strip().lower()})
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Admin account not found")
+    
+    if user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="This account does not have admin privileges")
+    
+    if not verify_password(req.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    if not user.get("is_active", True):
+        raise HTTPException(status_code=403, detail="Account disabled")
+    
+    token = create_token(str(user["_id"]), user["email"], "admin")
+    
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     return {
         "token": token,
         "user_id": str(user["_id"]),
@@ -321,7 +366,10 @@ async def admin_login(req: LoginRequest):
     }
 
 @api_router.post("/auth/register")
+<<<<<<< HEAD
 @limiter.limit("5/minute")  # Registration limit to prevent spam
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 async def register(req: RegisterRequest):
     email = req.email.strip().lower()
     if await db.users.find_one({"email": email}):
@@ -374,7 +422,10 @@ async def get_user_profile(user=Depends(get_current_user)):
 
 # ================== PANIC ROUTES ==================
 @api_router.post("/panic/activate")
+<<<<<<< HEAD
 @limiter.limit("20/minute")  # Panic activation limit
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 async def activate_panic(req: PanicActivateRequest, user = Depends(get_current_user)):
     if user.get('role') != 'civil':
         raise HTTPException(status_code=403, detail="Only civil users can activate panic")
@@ -463,6 +514,7 @@ async def update_panic_location(req: PanicLocationUpdate, user = Depends(get_cur
     
     return {"ok": True, "location_count": (panic.get("location_count", 0) + 1)}
 
+<<<<<<< HEAD
 # Standalone location update for security ping (no panic required)
 @api_router.post("/location/ping-update")
 async def ping_location_update(req: PanicLocationUpdate, user = Depends(get_current_user)):
@@ -496,6 +548,8 @@ async def ping_location_update(req: PanicLocationUpdate, user = Depends(get_curr
 
     return {"ok": True, "message": "Location transmitted via security ping"}
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 @api_router.post("/panic/{panic_id}/ambient-audio")
 async def attach_ambient_audio(panic_id: str, request: Request, user = Depends(get_current_user)):
     try:
@@ -564,6 +618,7 @@ async def get_panic_status(user = Depends(get_current_user)):
         "emergency_category": panic.get("emergency_category", "other")
     }
 
+<<<<<<< HEAD
 # ── Panic first-response claim ────────────────────────────────────────────────
 # Called by a security or admin operative the moment they send a Message In-App.
 # Uses a conditional update ($exists: False) so ONLY the first caller wins —
@@ -677,6 +732,8 @@ async def get_response_stats(user=Depends(get_current_user)):
         "team_avg_seconds":      avg_seconds(team_times),
     }
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 # ================== SECURITY ROUTES ==================
 @api_router.get("/security/nearby-panics")
 async def get_nearby_panics(
@@ -694,6 +751,7 @@ async def get_nearby_panics(
     
     async for panic in cursor:
         current_loc = panic.get("current_location", {})
+<<<<<<< HEAD
         # Fetch user profile photo and full details for panic cards
         panic_user_data = None
         if panic.get("user_id"):
@@ -702,14 +760,21 @@ async def get_nearby_panics(
                 panic_user_data = pu if pu else None
             except Exception:
                 pass
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         panics.append({
             "id": str(panic["_id"]),
             "user_id": panic.get("user_id"),
             "user_email": panic.get("user_email"),
+<<<<<<< HEAD
             "full_name": panic_user_data.get("full_name") if panic_user_data else None,
             "user_name": panic.get("user_name"),
             "user_phone": panic_user_data.get("phone") if panic_user_data else panic.get("user_phone"),
             "user_photo_url": panic_user_data.get("photo_url") if panic_user_data else None,
+=======
+            "user_name": panic.get("user_name"),
+            "user_phone": panic.get("user_phone"),
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             "is_active": panic.get("is_active", True),
             "activated_at": panic.get("activated_at").isoformat() if panic.get("activated_at") else None,
             "emergency_category": panic.get("emergency_category", "other"),
@@ -717,12 +782,16 @@ async def get_nearby_panics(
             "longitude": current_loc.get("longitude"),
             "location_history": panic.get("location_history", []),
             "location_count": panic.get("location_count", 0),
+<<<<<<< HEAD
             "ambient_audio_url": panic.get("ambient_audio_url"),
             # ── First-response tracking ─────────────────────────────
             "first_responder_id":    panic.get("first_responder_id"),
             "first_responder_name":  panic.get("first_responder_name"),
             "responded_at":          panic["responded_at"].isoformat() if panic.get("responded_at") else None,
             "response_time_seconds": panic.get("response_time_seconds"),
+=======
+            "ambient_audio_url": panic.get("ambient_audio_url")
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         })
     
     return panics
@@ -779,6 +848,7 @@ async def get_all_panics_admin(
                     "timestamp": timestamp
                 })
         
+<<<<<<< HEAD
         # Fetch user profile photo
         admin_panic_photo = None
         if panic.get("user_id"):
@@ -787,13 +857,18 @@ async def get_all_panics_admin(
                 admin_panic_photo = apu.get("photo_url") if apu else None
             except Exception:
                 pass
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         panics.append({
             "id": str(panic["_id"]),
             "user_id": panic.get("user_id"),
             "user_email": panic.get("user_email"),
             "user_name": panic.get("user_name"),
             "user_phone": panic.get("user_phone"),
+<<<<<<< HEAD
             "user_photo_url": admin_panic_photo,
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             "is_active": panic.get("is_active", False),
             "activated_at": panic.get("activated_at").isoformat() if panic.get("activated_at") else None,
             "deactivated_at": panic.get("deactivated_at").isoformat() if panic.get("deactivated_at") else None,
@@ -802,12 +877,16 @@ async def get_all_panics_admin(
             "longitude": current_loc.get("longitude") if current_loc else None,
             "location_history": formatted_history,
             "location_count": panic.get("location_count", 0),
+<<<<<<< HEAD
             "ambient_audio_url": panic.get("ambient_audio_url"),
             # ── First-response tracking ─────────────────────────────
             "first_responder_id":    panic.get("first_responder_id"),
             "first_responder_name":  panic.get("first_responder_name"),
             "responded_at":          panic["responded_at"].isoformat() if panic.get("responded_at") else None,
             "response_time_seconds": panic.get("response_time_seconds"),
+=======
+            "ambient_audio_url": panic.get("ambient_audio_url")
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         })
     
     return {"panics": panics, "total": len(panics)}
@@ -1070,6 +1149,7 @@ async def toggle_invite_code(code: str, user=Depends(get_admin_user)):
 
 # ================== INITIALIZATION FUNCTIONS ==================
 async def create_default_admins():
+<<<<<<< HEAD
     """Create default admin users if none exist.
 
     Admin credentials are loaded from environment variables:
@@ -1088,6 +1168,16 @@ async def create_default_admins():
             admin_data = {
                 "email": admin_email,
                 "password_hash": hash_password(admin_password),
+=======
+    """Create default admin users if none exist"""
+    try:
+        existing_admin = await db.users.find_one({"email": "anthonyezedinachi@gmail.com"})
+        
+        if not existing_admin:
+            admin_data = {
+                "email": "anthonyezedinachi@gmail.com",
+                "password_hash": hash_password("Admin123!"),
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 "role": "admin",
                 "full_name": "Anthony Ezedinachi",
                 "phone": "09150810387",
@@ -1096,6 +1186,7 @@ async def create_default_admins():
                 "created_at": datetime.utcnow()
             }
             result = await db.users.insert_one(admin_data)
+<<<<<<< HEAD
             logger.info(f"✅ Created admin: {admin_email}")
         else:
             await db.users.update_one(
@@ -1104,6 +1195,16 @@ async def create_default_admins():
             )
             logger.info("✅ Admin role/flags verified (password unchanged)")
 
+=======
+            logger.info(f"✅ Created admin: anthonyezedinachi@gmail.com")
+        else:
+            await db.users.update_one(
+                {"email": "anthonyezedinachi@gmail.com"},
+                {"$set": {"role": "admin", "is_active": True, "is_premium": True}}
+            )
+            logger.info("✅ Admin role/flags verified (password unchanged)")
+            
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     except Exception as e:
         logger.error(f"Failed to create default admins: {e}")
 
@@ -1262,6 +1363,7 @@ async def admin_all_reports(user=Depends(get_admin_user), limit: int = Query(100
     cursor = db.civil_reports.find({}).sort("created_at", -1).limit(limit)
     reports = []
     async for r in cursor:
+<<<<<<< HEAD
         # Look up the submitting user's profile photo for display in report cards
         user_photo_url = None
         if r.get("user_id"):
@@ -1286,6 +1388,23 @@ async def admin_all_reports(user=Depends(get_admin_user), limit: int = Query(100
             "longitude":      r.get("longitude"),
             "location":       r.get("location"),
             "created_at":     r["created_at"].isoformat() if isinstance(r.get("created_at"), datetime) else r.get("created_at"),
+=======
+        reports.append({
+            "id":          str(r["_id"]),
+            "user_id":     r.get("user_id"),
+            "user_name":   r.get("user_name"),
+            "user_email":  r.get("user_email"),
+            "user_phone":  r.get("user_phone"),
+            "type":        r.get("type", "video"),
+            "caption":     r.get("caption"),
+            "file_url":    r.get("file_url"),
+            "status":      r.get("status", "pending"),
+            "is_anonymous":r.get("is_anonymous", False),
+            "latitude":    r.get("latitude"),
+            "longitude":   r.get("longitude"),
+            "location":    r.get("location"),
+            "created_at":  r["created_at"].isoformat() if isinstance(r.get("created_at"), datetime) else r.get("created_at"),
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         })
     return {"reports": reports}
 
@@ -1351,6 +1470,7 @@ async def admin_reset_all(user=Depends(get_admin_user)):
 
 # ================== ADMIN SEARCH ==================
 @api_router.get("/admin/search")
+<<<<<<< HEAD
 async def admin_search(
     query: str = Query(...),
     data_type: str = Query("users"),
@@ -1375,13 +1495,26 @@ async def admin_search(
             results.append({
                 "type":      "user",
                 "data_type": "user",
+=======
+async def admin_search(query: str = Query(...), data_type: str = Query("users"), user=Depends(get_admin_user)):
+    results = []
+    regex = {"$regex": query, "$options": "i"}
+    if data_type in ("users", "all"):
+        cursor = db.users.find({"$or": [{"email": regex}, {"full_name": regex}, {"phone": regex}]}).limit(20)
+        async for u in cursor:
+            results.append({
+                "type":      "user",
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 "id":        str(u["_id"]),
                 "email":     u.get("email"),
                 "full_name": u.get("full_name"),
                 "phone":     u.get("phone"),
                 "role":      u.get("role"),
                 "is_active": u.get("is_active", True),
+<<<<<<< HEAD
                 "created_at": u.get("created_at").isoformat() if isinstance(u.get("created_at"), datetime) else None,
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             })
     return {"results": results}
 
@@ -1528,6 +1661,7 @@ async def security_nearby_reports(user=Depends(get_current_user)):
     }).sort("created_at", -1).limit(50)
     reports = []
     async for r in cursor:
+<<<<<<< HEAD
         user_photo_url = None
         if r.get("user_id"):
             try:
@@ -1547,6 +1681,16 @@ async def security_nearby_reports(user=Depends(get_current_user)):
             "latitude":       r.get("latitude"),
             "longitude":      r.get("longitude"),
             "created_at":     r["created_at"].isoformat() if isinstance(r.get("created_at"), datetime) else r.get("created_at"),
+=======
+        reports.append({
+            "id":        str(r["_id"]),
+            "type":      r.get("type"),
+            "caption":   r.get("caption"),
+            "file_url":  r.get("file_url"),
+            "latitude":  r.get("latitude"),
+            "longitude": r.get("longitude"),
+            "created_at":r["created_at"].isoformat() if isinstance(r.get("created_at"), datetime) else r.get("created_at"),
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         })
     return reports
 
@@ -2040,10 +2184,13 @@ async def security_track_user(uid: str, user=Depends(get_current_user)):
 
     panic = await db.panic_events.find_one({"user_id": uid, "is_active": True})
     escort = await db.escort_sessions.find_one({"user_id": uid, "is_active": True})
+<<<<<<< HEAD
 
     # Also check civil_tracks for ping-response locations (works even without panic/escort)
     civil_track = await db.civil_tracks.find_one({"user_id": uid})
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     location_history = []
     latitude, longitude, is_active = None, None, False
 
@@ -2060,6 +2207,7 @@ async def security_track_user(uid: str, user=Depends(get_current_user)):
             latitude  = latest.get("latitude")
             longitude = latest.get("longitude")
         is_active = True
+<<<<<<< HEAD
     elif civil_track:
         # User was pinged but has no active panic/escort — show ping-response location
         current_loc = civil_track.get("currentLocation", {})
@@ -2068,6 +2216,8 @@ async def security_track_user(uid: str, user=Depends(get_current_user)):
             latitude  = current_loc["coordinates"][1] if len(current_loc["coordinates"]) > 1 else None
         location_history = civil_track.get("location_history", [])
         is_active = True  # Track is active = user can be pinged
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
     return {
         "is_active":        is_active,
@@ -2165,6 +2315,7 @@ async def get_contactable_users(user=Depends(get_current_user)):
         })
     return {"users": users}
 
+<<<<<<< HEAD
 # CORS Configuration
 # Restrict to specific origins for production security
 ALLOWED_ORIGINS = os.environ.get(
@@ -2172,12 +2323,21 @@ ALLOWED_ORIGINS = os.environ.get(
     'se-q-app.com,your-app.expo.dev,*.expo.dev,*.expo.io'
 ).split(',')
 
+=======
+# ================== FINAL SETUP ==================
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
+<<<<<<< HEAD
     allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
+=======
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 )

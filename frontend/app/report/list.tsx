@@ -21,8 +21,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+<<<<<<< HEAD
 import { Audio } from 'expo-av';
 import { WebView } from 'react-native-webview';
+=======
+import { Audio, Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { getAuthToken, clearAuthData } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
 import {
@@ -30,6 +34,7 @@ import {
   uploadQueuedReport, QueuedReport,
 } from '../../utils/offlineQueue';
 
+<<<<<<< HEAD
 // ─── WebView video helper ─────────────────────────────────────────────────────
 // expo-av 16 Video component crashes on RN 0.83 / SDK 55:
 // ViewUtils.tryRunWithVideoViewOnUiThread → UIManager.resolveView(int) removed
@@ -75,6 +80,8 @@ const buildVideoHtml = (url: string): string => {
 };
 
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 export default function ReportList() {
   const router = useRouter();
   const [reports,        setReports]        = useState<any[]>([]);
@@ -94,7 +101,11 @@ export default function ReportList() {
   // ── Standardised video player state (mirrors admin/reports.tsx) ────────
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [videoStatus,   setVideoStatus]   = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+<<<<<<< HEAD
   // videoRef removed — expo-av Video replaced with WebView (NoSuchMethodError fix)
+=======
+  const videoRef = useRef<Video>(null);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   useFocusEffect(
     useCallback(() => {
@@ -345,6 +356,10 @@ export default function ReportList() {
     const resolvedVideoUrl = resolveMediaUrl(selectedVideo);
 
     const closePlayer = () => {
+<<<<<<< HEAD
+=======
+      videoRef.current?.pauseAsync().catch(() => {});
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       setSelectedVideo(null);
       setVideoStatus('idle');
     };
@@ -361,6 +376,7 @@ export default function ReportList() {
 
         <View style={styles.videoScreenCenter}>
           <View style={styles.videoWrapper}>
+<<<<<<< HEAD
             <WebView
               originWhitelist={['*']}
               source={{ html: buildVideoHtml(resolvedVideoUrl), baseUrl: '' }}
@@ -376,6 +392,31 @@ export default function ReportList() {
                 const msg = e.nativeEvent.data;
                 if (msg === 'ready' || msg === 'ended') setVideoStatus('ready');
                 if (msg === 'error') setVideoStatus('error');
+=======
+            <Video
+              ref={videoRef}
+              source={{ uri: resolvedVideoUrl }}
+              style={styles.videoPlayer}
+              useNativeControls
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay={false}
+              isLooping={false}
+              onLoadStart={() => setVideoStatus('loading')}
+              onLoad={() => setVideoStatus('ready')}
+              onPlaybackStatusUpdate={(status: AVPlaybackStatus) => {
+                if (!status.isLoaded) return;
+                if (videoStatus === 'loading') setVideoStatus('ready');
+                // Mirrors admin: pause first, then rewind — prevents auto-resume loop
+                if (status.didJustFinish) {
+                  videoRef.current?.pauseAsync().catch(() => {}).finally(() => {
+                    videoRef.current?.setPositionAsync(0).catch(() => {});
+                  });
+                }
+              }}
+              onError={(err) => {
+                console.error('[CivilVideoPlayer] Error:', err);
+                setVideoStatus('error');
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
               }}
             />
 
@@ -392,7 +433,11 @@ export default function ReportList() {
                 <Text style={styles.videoOverlayText}>Could not load video</Text>
                 <TouchableOpacity
                   style={styles.videoRetryBtn}
+<<<<<<< HEAD
                   onPress={() => { setVideoStatus('loading'); }}
+=======
+                  onPress={() => { setVideoStatus('loading'); videoRef.current?.loadAsync({ uri: resolvedVideoUrl }, {}, false); }}
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 >
                   <Ionicons name="refresh" size={18} color="#fff" />
                   <Text style={styles.videoRetryText}>Retry</Text>

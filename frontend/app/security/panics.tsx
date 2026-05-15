@@ -16,7 +16,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
   ActivityIndicator, Alert, Linking, Platform, Modal,
+<<<<<<< HEAD
   TextInput, KeyboardAvoidingView, Image,
+=======
+  TextInput, KeyboardAvoidingView,
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -26,7 +30,10 @@ import axios from 'axios';
 import { getAuthToken, clearAuthData } from '../../utils/auth';
 import { LocationMapModal } from '../../components/LocationMapModal';
 import BACKEND_URL from '../../utils/config';
+<<<<<<< HEAD
 import { setPlaybackAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 
 // Poll every 10 seconds for live GPS
@@ -54,7 +61,10 @@ export default function SecurityPanics() {
   const router = useRouter();
   const [panics, setPanics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [myUserId, setMyUserId] = useState<string | null>(null); // for first-responder lock
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const [locationModal, setLocationModal] = useState<{
     visible: boolean; lat: number; lng: number; title: string
   } | null>(null);
@@ -62,7 +72,10 @@ export default function SecurityPanics() {
   const [countdown, setCountdown] = useState(10);
   const pollRef = useRef<any>(null);
   const countRef = useRef<any>(null);
+<<<<<<< HEAD
   const [profilePhotoModal, setProfilePhotoModal] = useState<{visible: boolean; photoUrl: string; userName: string} | null>(null);
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   // ── Ambient audio player state ────────────────────────────────────────────
   const soundRef    = useRef<Audio.Sound | null>(null);
@@ -95,9 +108,12 @@ export default function SecurityPanics() {
       try { await soundRef.current.unloadAsync(); } catch (_) {}
       soundRef.current = null;
     }
+<<<<<<< HEAD
     // FIX: Reset AudioSession to safe defaults after playback ends.
     // Uses centralized AudioManager helper for consistent behavior.
     await restorePlaybackAudioMode();
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     setPlayingId(null);
     setAudioLoading(null);
   };
@@ -114,10 +130,16 @@ export default function SecurityPanics() {
 
     setAudioLoading(panicId);
     try {
+<<<<<<< HEAD
       // FIX: Use centralized audio mode management to prevent clashes
       await setPlaybackAudioMode();
       const { sound } = await Audio.Sound.createAsync(
         { uri: url, downloadFirst: true },
+=======
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, staysActiveInBackground: false });
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: url },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         { shouldPlay: true }
       );
       soundRef.current = sound;
@@ -139,6 +161,7 @@ export default function SecurityPanics() {
     }
   };
 
+<<<<<<< HEAD
   // Load current agent's user ID once — used to determine first-responder lock
   useEffect(() => {
     (async () => {
@@ -153,6 +176,8 @@ export default function SecurityPanics() {
     })();
   }, []);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // Cleanup ambient audio on unmount
   useEffect(() => { return () => { stopAudio(); }; }, []);
 
@@ -232,6 +257,7 @@ export default function SecurityPanics() {
   const callUser = (phone: string) =>
     phone ? Linking.openURL(`tel:${phone}`) : Alert.alert('No Phone', 'Phone number not available');
 
+<<<<<<< HEAD
   const markConvRead = async (convId: string, token: string) => {
     try {
       await axios.post(
@@ -242,6 +268,8 @@ export default function SecurityPanics() {
     } catch (_) { /* non-critical */ }
   };
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // ── In-app chat (opened from Respond modal) ───────────────────────────────
   const openInAppChat = async (panicItem: any) => {
     setRespondModal(null);
@@ -289,6 +317,7 @@ export default function SecurityPanics() {
         );
       }
 
+<<<<<<< HEAD
       // UNREAD FIX: Mark conversation as read immediately after opening it.
       // The SITREP message we just sent increments unread for the civil user
       // (correct) but any messages already in the thread that the civil user
@@ -296,12 +325,15 @@ export default function SecurityPanics() {
       // the badge on /security/home resets on the next unread-count poll.
       await markConvRead(convId, token);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       const msgRes = await axios.get(
         `${BACKEND_URL}/api/chat/${convId}/messages`,
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
       setChatMessages(msgRes.data?.messages || []);
       setChatConv({ convId, otherUserId, otherName });
+<<<<<<< HEAD
 
       // ── First-response claim ─────────────────────────────────────────────
       // POST after chat is open so the UI transition isn't blocked.
@@ -331,6 +363,8 @@ export default function SecurityPanics() {
         console.error('[Respond] Failed:', err?.response?.data || err?.message);
         Alert.alert('Response Error', 'Could not mark panic as responded. Please try again.');
       }
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     } catch (err: any) {
       Alert.alert('Error', err?.response?.data?.detail || 'Could not open chat');
     } finally {
@@ -347,10 +381,13 @@ export default function SecurityPanics() {
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
       setChatMessages(res.data?.messages || []);
+<<<<<<< HEAD
       // UNREAD FIX: Mark read every time messages are (re)loaded while the
       // officer is in the chat — covers the manual refresh button and the
       // poll triggered after the civil user replies.
       await markConvRead(convId, token);
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     } catch (_) {}
   };
 
@@ -366,8 +403,11 @@ export default function SecurityPanics() {
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
       setChatInput('');
+<<<<<<< HEAD
       // UNREAD FIX: Reload messages then immediately mark read so the officer's
       // own send action never leaves a phantom unread count on their home badge.
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       await loadChatMessages(chatConv.convId);
     } catch (_) {} finally { setChatSending(false); }
   };
@@ -419,6 +459,7 @@ export default function SecurityPanics() {
     </TouchableOpacity>
   );
 
+<<<<<<< HEAD
   // ── Resolve photo URL helper ─────────────────────────────────────────────
   const resolvePhotoUrl = (url: string): string => {
     if (!url) return '';
@@ -426,6 +467,8 @@ export default function SecurityPanics() {
     return `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // ── Panic card ────────────────────────────────────────────────────────────
   const renderPanic = ({ item }: any) => {
     const cat = catInfo(item.emergency_category);
@@ -433,8 +476,11 @@ export default function SecurityPanics() {
     const name = getSenderName(item);
     const history: GpsPt[] = item.location_history || [];
     const chronoHistory = [...history].reverse();
+<<<<<<< HEAD
     // Resolve user photo URL
     const userPhotoUrl = resolvePhotoUrl(item.user_photo_url);
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
     return (
       <View style={styles.card}>
@@ -452,6 +498,7 @@ export default function SecurityPanics() {
 
         {/* User info */}
         <View style={styles.userRow}>
+<<<<<<< HEAD
           <TouchableOpacity
             style={styles.avatar}
             onPress={() => {
@@ -472,6 +519,11 @@ export default function SecurityPanics() {
               </View>
             )}
           </TouchableOpacity>
+=======
+          <View style={styles.avatar}>
+            <Ionicons name="person-circle" size={44} color="#3B82F6" />
+          </View>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           <View style={{ flex: 1 }}>
             <Text style={styles.userName}>{name}</Text>
             <Text style={styles.userEmail}>{item.user_email || 'No email'}</Text>
@@ -566,6 +618,7 @@ export default function SecurityPanics() {
 
         {/* Actions */}
         <View style={styles.actions}>
+<<<<<<< HEAD
           {(() => {
             const respondedBy  = item.first_responder_id;
             const isMe         = respondedBy && respondedBy === myUserId;
@@ -615,6 +668,21 @@ export default function SecurityPanics() {
               </TouchableOpacity>
             );
           })()}
+=======
+          <TouchableOpacity
+            style={styles.respondBtn}
+            onPress={() => {
+              if (!item.latitude || !item.longitude) {
+                Alert.alert('Location Error', 'User location not available');
+                return;
+              }
+              setRespondModal(item);
+            }}
+          >
+            <Ionicons name="navigate" size={20} color="#fff" />
+            <Text style={styles.respondBtnText}>Respond</Text>
+          </TouchableOpacity>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         </View>
       </View>
     );
@@ -742,6 +810,7 @@ export default function SecurityPanics() {
         />
       )}
 
+<<<<<<< HEAD
       {/* Profile Photo Full-Size Modal */}
       {profilePhotoModal && (
         <Modal visible transparent animationType="slide" onRequestClose={() => setProfilePhotoModal(null)}>
@@ -771,6 +840,8 @@ export default function SecurityPanics() {
         </Modal>
       )}
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       {/* Respond modal */}
       {respondModal && (
         <Modal visible transparent animationType="fade" onRequestClose={() => setRespondModal(null)}>
@@ -842,8 +913,12 @@ const styles = StyleSheet.create({
   catBadge:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, gap: 5 },
   catText:          { fontSize: 11, fontWeight: '600' },
   userRow:          { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
+<<<<<<< HEAD
   avatar:           { width: 52, height: 52, borderRadius: 26, backgroundColor: '#3B82F620', justifyContent: 'center', alignItems: 'center', marginRight: 12, overflow: 'hidden' },
   avatarImg:        { width: 52, height: 52, borderRadius: 26, borderWidth: 2, borderColor: '#3B82F6' },
+=======
+  avatar:           { width: 52, height: 52, borderRadius: 26, backgroundColor: '#3B82F620', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   userName:         { fontSize: 16, fontWeight: '700', color: '#fff', marginBottom: 3 },
   userEmail:        { fontSize: 12, color: '#94A3B8', marginBottom: 2 },
   userPhone:        { fontSize: 13, color: '#10B981', fontWeight: '600' },
@@ -940,6 +1015,7 @@ const chatSt = StyleSheet.create({
   input:        { flex: 1, backgroundColor: '#1E293B', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 12, color: '#fff', fontSize: 15, maxHeight: 100 },
   sendBtn:      { width: 44, height: 44, borderRadius: 22, backgroundColor: '#3B82F6', justifyContent: 'center', alignItems: 'center' },
   sendBtnOff:   { backgroundColor: '#334155' },
+<<<<<<< HEAD
   // Avatar styles
   avatarZoomBadge: { position: 'absolute', bottom: 2, right: 2, backgroundColor: '#3B82F6', borderRadius: 8, width: 18, height: 18, justifyContent: 'center', alignItems: 'center' },
 });
@@ -955,4 +1031,6 @@ const profileModalStyles = StyleSheet.create({
   fullImage: { width: '100%', height: '100%' },
   userName: { fontSize: 20, fontWeight: '700', color: '#fff', marginBottom: 4 },
   subtitle: { fontSize: 14, color: '#94A3B8' },
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 });

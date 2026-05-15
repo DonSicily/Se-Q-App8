@@ -2,4 +2,8 @@
   <string name="app_name">Se-Q</string>
   <string name="expo_system_ui_user_interface_style" translatable="false">dark</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
+<<<<<<< HEAD
+=======
+  <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 </resources>

@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
   RefreshControl, Linking, Modal, Platform, ActivityIndicator,
+<<<<<<< HEAD
   BackHandler, Image} from 'react-native';
+=======
+  BackHandler} from 'react-native';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { getAuthToken, clearAuthData } from '../../utils/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
+<<<<<<< HEAD
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { WebView } from 'react-native-webview';
 import BACKEND_URL from '../../utils/config';
@@ -58,6 +63,12 @@ const buildVideoHtml = (url: string): string => {
   );
 };
 
+=======
+import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { Audio } from 'expo-av';
+import BACKEND_URL from '../../utils/config';
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 type DateFilter = 'all' | 'today' | 'last_week' | 'last_month' | 'custom';
 
@@ -90,7 +101,11 @@ export default function AdminReports() {
   const [audioStatus, setAudioStatus] = useState<'idle' | 'loading' | 'playing' | 'paused' | 'error'>('idle');
   const [videoStatus, setVideoStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const soundRef = useRef<Audio.Sound | null>(null);
+<<<<<<< HEAD
   // videoRef removed — expo-av Video replaced with WebView (NoSuchMethodError fix)
+=======
+  const videoRef = useRef<Video>(null);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   useEffect(() => {
     // Configure audio session once on mount — critical for iOS speaker playback
@@ -210,7 +225,11 @@ export default function AdminReports() {
       console.log('[AudioPlay] Loading:', uri);
 
       const { sound } = await Audio.Sound.createAsync(
+<<<<<<< HEAD
         { uri, downloadFirst: true },
+=======
+        { uri },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         { shouldPlay: true, progressUpdateIntervalMillis: 500 }
       );
       soundRef.current = sound;
@@ -286,6 +305,7 @@ export default function AdminReports() {
     };
   };
 
+<<<<<<< HEAD
   // ── Evidence download ────────────────────────────────────────────────────────
   const handleDownload = (fileUrl: string, e: any) => {
     e.stopPropagation(); // prevent opening the media modal
@@ -299,6 +319,8 @@ export default function AdminReports() {
     );
   };
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // ── Card renderer ────────────────────────────────────────────────────────────
   const renderReport = ({ item }: any) => {
     const sender = getSenderDisplay(item);
@@ -332,6 +354,7 @@ export default function AdminReports() {
               <Text style={styles.anonymousText}>Anonymous</Text>
             </View>
           )}
+<<<<<<< HEAD
           {hasMedia && (
             <TouchableOpacity
               style={styles.downloadBtn}
@@ -342,15 +365,21 @@ export default function AdminReports() {
               <Ionicons name="download-outline" size={16} color="#fff" />
             </TouchableOpacity>
           )}
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         </View>
 
         <View style={styles.senderSection}>
           <View style={[styles.senderAvatar, sender.isAnonymous && { backgroundColor: '#64748B20' }]}>
+<<<<<<< HEAD
             {(!sender.isAnonymous && item.user_photo_url) ? (
               <Image source={{ uri: item.user_photo_url }} style={styles.senderAvatarImg} />
             ) : (
               <Ionicons name={sender.isAnonymous ? 'eye-off' : 'person'} size={22} color={sender.isAnonymous ? '#64748B' : '#8B5CF6'} />
             )}
+=======
+            <Ionicons name={sender.isAnonymous ? 'eye-off' : 'person'} size={22} color={sender.isAnonymous ? '#64748B' : '#8B5CF6'} />
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           </View>
           <View style={styles.senderInfo}>
             <Text style={styles.senderName}>{sender.name}</Text>
@@ -557,6 +586,7 @@ export default function AdminReports() {
             {/* ── VIDEO ──────────────────────────────────────────────────── */}
             {selectedReport.type === 'video' && !!selectedReport.file_url && (
               <View style={styles.videoWrapper}>
+<<<<<<< HEAD
                 <WebView
                   originWhitelist={['*']}
                   source={{ html: buildVideoHtml(getMediaUrl(selectedReport.file_url)), baseUrl: '' }}
@@ -572,6 +602,33 @@ export default function AdminReports() {
                     const msg = e.nativeEvent.data;
                     if (msg === 'ready' || msg === 'ended') setVideoStatus('ready');
                     if (msg === 'error') setVideoStatus('error');
+=======
+                <Video
+                  ref={videoRef}
+                  source={{ uri: getMediaUrl(selectedReport.file_url) }}
+                  style={styles.videoPlayer}
+                  useNativeControls
+                  resizeMode={ResizeMode.CONTAIN}
+                  shouldPlay={false}
+                  isLooping={false}
+                  onLoadStart={() => setVideoStatus('loading')}
+                  onLoad={() => setVideoStatus('ready')}
+                  onPlaybackStatusUpdate={(status: AVPlaybackStatus) => {
+                    if (!status.isLoaded) return;
+                    if (videoStatus === 'loading') setVideoStatus('ready');
+                    // FIX #2: When video finishes, pause first then rewind to start.
+                    // Without the explicit pause the native player auto-resumes after
+                    // setPositionAsync(0), creating an infinite playback loop.
+                    if (status.didJustFinish) {
+                      videoRef.current?.pauseAsync().catch(() => {}).finally(() => {
+                        videoRef.current?.setPositionAsync(0).catch(() => {});
+                      });
+                    }
+                  }}
+                  onError={(err) => {
+                    console.error('[VideoPlay] Error:', err);
+                    setVideoStatus('error');
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                   }}
                 />
                 {videoStatus === 'loading' && (
@@ -716,10 +773,15 @@ const styles = StyleSheet.create({
   typeText:           { fontSize: 12, fontWeight: '600' },
   anonymousBadge:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
   anonymousText:      { fontSize: 12, color: '#64748B' },
+<<<<<<< HEAD
   downloadBtn:        { width: 30, height: 30, borderRadius: 15, backgroundColor: '#16A34A', justifyContent: 'center', alignItems: 'center', marginLeft: 'auto' },
   senderSection:      { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0F172A', borderRadius: 12, padding: 12, marginBottom: 12 },
   senderAvatar:       { width: 48, height: 48, borderRadius: 24, backgroundColor: '#8B5CF620', justifyContent: 'center', alignItems: 'center', marginRight: 12, overflow: 'hidden' },
   senderAvatarImg:    { width: 48, height: 48, borderRadius: 24 },
+=======
+  senderSection:      { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0F172A', borderRadius: 12, padding: 12, marginBottom: 12 },
+  senderAvatar:       { width: 48, height: 48, borderRadius: 24, backgroundColor: '#8B5CF620', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   senderInfo:         { flex: 1 },
   senderName:         { fontSize: 16, fontWeight: '600', color: '#fff' },
   senderDetail:       { fontSize: 13, color: '#94A3B8', marginTop: 2 },

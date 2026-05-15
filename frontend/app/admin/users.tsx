@@ -80,8 +80,12 @@ export default function AdminUsers() {
       const token = await getAuthToken();
       if (!token) { router.replace('/admin/login'); return; }
 
+<<<<<<< HEAD
       // FIX: backend route is POST, not PUT
       await axios.post(
+=======
+      await axios.put(
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         `${BACKEND_URL}/api/admin/users/${userId}/toggle`,
         {},
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
@@ -118,9 +122,14 @@ export default function AdminUsers() {
       const token = await getAuthToken();
       if (!token) { router.replace('/admin/login'); return; }
 
+<<<<<<< HEAD
       // FIX: backend delete route is DELETE /admin/delete/user/{id}, not /admin/users/{id}
       await axios.delete(
         `${BACKEND_URL}/api/admin/delete/user/${userId}`,
+=======
+      await axios.delete(
+        `${BACKEND_URL}/api/admin/users/${userId}`,
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
       setUsers(prev => prev.filter(u => u.id !== userId));

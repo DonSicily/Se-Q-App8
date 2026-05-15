@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+<<<<<<< HEAD
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, BackHandler, Image } from 'react-native';
+=======
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, BackHandler } from 'react-native';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,7 +17,10 @@ import * as TaskManager from 'expo-task-manager';
 import { getAuthToken, clearAuthData, getUserMetadata } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
 import { setNativePanicActive } from '../../utils/nativePanicBridge';
+<<<<<<< HEAD
 import { setAlertAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 const PANIC_LOCATION_TASK = 'background-location-panic';
 
@@ -29,7 +36,10 @@ export default function CivilHome() {
   const [appDisplayName, setAppDisplayName] = useState('Se-Q');
   const [appDisplayIcon, setAppDisplayIcon] = useState('shield');
   const [unreadMessages, setUnreadMessages] = useState(0);
+<<<<<<< HEAD
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   // ── Message sound alert (plays on new unread messages) ───────────────────
   const prevUnreadRef  = useRef(0);
@@ -91,8 +101,12 @@ export default function CivilHome() {
         await msgSoundRef.current.unloadAsync().catch(() => {});
         msgSoundRef.current = null;
       }
+<<<<<<< HEAD
       // FIX: Use centralized audio mode management to prevent clashes
       await setAlertAudioMode();
+=======
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, staysActiveInBackground: false });
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       const { sound } = await Audio.Sound.createAsync(
         { uri: 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' },
         { shouldPlay: true, volume: 0.85 }
@@ -102,9 +116,12 @@ export default function CivilHome() {
         if (status.isLoaded && status.didJustFinish) {
           sound.unloadAsync().catch(() => {});
           msgSoundRef.current = null;
+<<<<<<< HEAD
           // FIX: Restore audio mode to neutral defaults once the alert tone finishes
           // Uses centralized AudioManager helper for consistent behavior
           restorePlaybackAudioMode();
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         }
       });
     } catch (_) {}
@@ -218,10 +235,13 @@ export default function CivilHome() {
           if (response.data?.full_name) {
             setUserName(response.data.full_name);
           }
+<<<<<<< HEAD
           if (response.data?.profile_photo_url) {
             const url = response.data.profile_photo_url;
             setProfilePhoto(url.startsWith('http') ? url : `${BACKEND_URL}${url}`);
           }
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         } catch (apiError: any) {
           console.log('[CivilHome] Could not verify with backend:', apiError?.response?.status);
           if (apiError?.response?.status === 401) {
@@ -268,6 +288,7 @@ export default function CivilHome() {
     Alert.alert('Upload Complete', `Processed ${results.length} items`);
   };
 
+<<<<<<< HEAD
   const handlePanicPress = async () => {
     if (hasActivePanic) {
       // Deactivate directly — no confirmation dialog exposed to bystanders
@@ -322,6 +343,80 @@ export default function CivilHome() {
     } else {
       // Start new panic — navigate directly to category picker
       router.push('/civil/panic-active');
+=======
+  const handlePanicPress = () => {
+    if (hasActivePanic) {
+      // Deactivate panic directly here — never navigate to panic-active for deactivation
+      Alert.alert(
+        "✅ I'm Safe Now",
+        'This will stop tracking and notify security that you are safe.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: "Yes, I'm Safe",
+            onPress: async () => {
+              try {
+                const token = await getAuthToken();
+
+                // Stop background GPS task
+                try {
+                  const taskRunning = await TaskManager.isTaskRegisteredAsync(PANIC_LOCATION_TASK).catch(() => false);
+                  if (taskRunning) {
+                    await Location.stopLocationUpdatesAsync(PANIC_LOCATION_TASK);
+                  }
+                } catch (_) {}
+
+                // Deactivate on backend
+                if (token) {
+                  await axios.post(
+                    `${BACKEND_URL}/api/panic/deactivate`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
+                  );
+                }
+
+                // Clear all local panic state
+                await AsyncStorage.multiRemove([
+                  'panic_active', 'panic_started_at', 'panic_id', 'active_panic',
+                ]);
+
+                // CRITICAL FIX: Tell native service that panic is no longer active
+                await setNativePanicActive(false);
+                console.log('[CivilHome] Native panic active flag set to FALSE');
+
+                setHasActivePanic(false);
+
+                Alert.alert(
+                  '✅ You are Safe',
+                  'Panic mode deactivated. Security has been notified.'
+                );
+              } catch (err: any) {
+                if (err?.response?.status === 401) {
+                  await clearAuthData();
+                  router.replace('/auth/login');
+                } else {
+                  Alert.alert('Error', 'Failed to deactivate. Please try again.');
+                }
+              }
+            },
+          },
+        ]
+      );
+    } else {
+      // Start new panic — navigate to category picker
+      Alert.alert(
+        '🚨 Activate Panic Mode?',
+        'This will alert nearby security agencies and start tracking your location.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Yes, Activate',
+            style: 'destructive',
+            onPress: () => router.push('/civil/panic-active'),
+          },
+        ]
+      );
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     }
   };
 
@@ -361,6 +456,7 @@ export default function CivilHome() {
           </View>
           <View style={styles.headerRight}>
             {/* Shake-to-panic active indicator */}
+<<<<<<< HEAD
             <View style={styles.shakeIndicator}>
               <Ionicons name="radio" size={14} color="#10B981" />
               <Text style={styles.shakeIndicatorText}>SHAKE</Text>
@@ -371,6 +467,21 @@ export default function CivilHome() {
               ) : (
                 <Ionicons name="settings-outline" size={28} color="#fff" />
               )}
+=======
+            <TouchableOpacity
+              style={styles.shakeIndicator}
+              onPress={() => Alert.alert(
+                '🤝 Shake-to-Panic Active',
+                'Shake your phone 5 times hard and fast to instantly trigger an emergency alert — even when your screen is off.',
+                [{ text: 'Got it' }]
+              )}
+            >
+              <Ionicons name="radio" size={14} color="#10B981" />
+              <Text style={styles.shakeIndicatorText}>SHAKE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/settings')}>
+              <Ionicons name="settings-outline" size={28} color="#fff" />
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             </TouchableOpacity>
           </View>
         </View>
@@ -510,7 +621,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0F172A' },
   loadingContainer:    { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerRight:         { flexDirection: 'row', alignItems: 'center', gap: 12 },
+<<<<<<< HEAD
   headerAvatar:        { width: 36, height: 36, borderRadius: 18, borderWidth: 2, borderColor: '#3B82F6' },
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   shakeIndicator:      { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#10B98115', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: '#10B98130' },
   shakeIndicatorText:  { fontSize: 9, color: '#10B981', fontWeight: '700', letterSpacing: 1.5 },
   loadingText: { color: '#94A3B8', marginTop: 12 },

@@ -211,7 +211,11 @@ export default function PanicShake() {
                 // FIX #3: Neutral strings — nothing that reveals this is a
                 // security/emergency app if the notification shade is seen.
                 notificationTitle: 'Se-Q',
+<<<<<<< HEAD
                 notificationBody:  'Se-Q Active',
+=======
+                notificationBody:  'Location tracking active',
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
                 notificationColor: '#EF4444',
               },
               pausesUpdatesAutomatically:        false,

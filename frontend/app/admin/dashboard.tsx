@@ -2,18 +2,28 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView,
   RefreshControl, Alert, ActivityIndicator, Animated, Modal, Platform,
+<<<<<<< HEAD
   BackHandler, Image,
+=======
+  BackHandler,
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+<<<<<<< HEAD
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import axios from 'axios';
 import { getAuthToken, clearAuthData, getUserMetadata } from '../../utils/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BACKEND_URL from '../../utils/config';
+<<<<<<< HEAD
 import { setAlertAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 
 const showAlert = (title: string, message: string, buttons?: Array<{text: string, onPress?: () => void, style?: string}>) => {
@@ -45,10 +55,13 @@ export default function AdminDashboard() {
   // AMENDMENT 3 — Unread message count for the Messaging action card badge
   const [unreadMessages, setUnreadMessages] = useState(0);
 
+<<<<<<< HEAD
   // ── Message sound alert refs ──────────────────────────────────────────────
   const prevUnreadRef  = useRef(0);
   const msgSoundRef    = useRef<Audio.Sound | null>(null);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [calStartDate, setCalStartDate] = useState<Date>(new Date(Date.now() - 7 * 86400000));
   const [calEndDate, setCalEndDate] = useState<Date>(new Date());
@@ -76,6 +89,7 @@ export default function AdminDashboard() {
     return () => pulse.stop();
   }, []);
 
+<<<<<<< HEAD
   // ── Real-time panic count polling (every 10 s) ─────────────────────────────
   // CRITICAL: Admin dashboard must poll for active panic counts to update the
   // alert banner in real-time, just like the Security dashboard does.
@@ -96,6 +110,8 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, []);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // ── Unread message polling (every 20 s) ──────────────────────────────────
   useEffect(() => {
     const poll = async () => {
@@ -106,6 +122,7 @@ export default function AdminDashboard() {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 8000,
         });
+<<<<<<< HEAD
         const count: number = res.data?.count ?? 0;
         setUnreadMessages(count);
 
@@ -118,6 +135,9 @@ export default function AdminDashboard() {
           }
         }
         prevUnreadRef.current = count;
+=======
+        setUnreadMessages(res.data?.count ?? 0);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       } catch (_) {}
     };
     poll();
@@ -125,6 +145,7 @@ export default function AdminDashboard() {
     return () => clearInterval(id);
   }, []);
 
+<<<<<<< HEAD
   // Cleanup message sound on unmount
   useEffect(() => {
     return () => {
@@ -161,6 +182,8 @@ export default function AdminDashboard() {
     } catch (_) {}
   };
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   // Re-poll immediately when returning to the dashboard (e.g. after reading messages)
   useFocusEffect(
     useCallback(() => {
@@ -234,7 +257,11 @@ export default function AdminDashboard() {
         onPress: async () => {
           try {
             const token = await getAuthToken();
+<<<<<<< HEAD
             const res = await axios.post(`${BACKEND_URL}/api/admin/clear-uploads`, {}, {
+=======
+            const res = await axios.delete(`${BACKEND_URL}/api/admin/clear-uploads`, {
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
               headers: { Authorization: `Bearer ${token}` }, timeout: 30000
             });
             showAlert('✅ Cleared', res.data?.message || 'All uploads cleared.', [{ text: 'OK' }]);
@@ -256,7 +283,11 @@ export default function AdminDashboard() {
         onPress: async () => {
           try {
             const token = await getAuthToken();
+<<<<<<< HEAD
             const res = await axios.post(`${BACKEND_URL}/api/admin/clear-panics`, {}, {
+=======
+            const res = await axios.delete(`${BACKEND_URL}/api/admin/clear-panics`, {
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
               headers: { Authorization: `Bearer ${token}` }, timeout: 30000
             });
             showAlert('✅ Cleared', res.data?.message || 'All panics cleared.', [{ text: 'OK' }]);
@@ -330,7 +361,11 @@ export default function AdminDashboard() {
         onPress: async () => {
           try {
             const token = await getAuthToken();
+<<<<<<< HEAD
             const res = await axios.post(`${BACKEND_URL}/api/admin/reset-all-data`, {}, {
+=======
+            const res = await axios.delete(`${BACKEND_URL}/api/admin/reset-all-data`, {
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
               headers: { Authorization: `Bearer ${token}` }, timeout: 60000
             });
             showAlert('✅ Reset Complete', res.data?.message || 'All data has been cleared.', [{ text: 'OK' }]);
@@ -359,11 +394,17 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+<<<<<<< HEAD
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View>
             <Text style={styles.greeting}>Command Center</Text>
             <Text style={styles.adminName} numberOfLines={1}>{adminEmail}</Text>
           </View>
+=======
+        <View>
+          <Text style={styles.greeting}>Command Center</Text>
+          <Text style={styles.adminName} numberOfLines={1}>{adminEmail}</Text>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerBtn} onPress={() => router.replace('/admin/audit-log')}>
@@ -663,7 +704,10 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 11, color: '#64748B', textTransform: 'uppercase', letterSpacing: 1 },
   adminName: { fontSize: 17, fontWeight: 'bold', color: '#fff', maxWidth: 220 },
   headerActions: { flexDirection: 'row', gap: 4 },
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   headerBtn: { padding: 8 },
   content: { flex: 1, paddingHorizontal: 16 },
   alertBanner: { marginTop: 14, borderRadius: 14, overflow: 'hidden' },

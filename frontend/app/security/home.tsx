@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+<<<<<<< HEAD
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, TextInput, ActivityIndicator, BackHandler, AppState, AppStateStatus, Image } from 'react-native';
+=======
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, TextInput, ActivityIndicator, BackHandler, AppState, AppStateStatus } from 'react-native';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +11,10 @@ import { Audio } from 'expo-av';
 import axios from 'axios';
 import { getAuthToken, clearAuthData, getUserMetadata } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
+<<<<<<< HEAD
 import { AudioManager, setAlertAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 
 export default function SecurityHome() {
@@ -20,6 +27,7 @@ export default function SecurityHome() {
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [agentName, setAgentName] = useState('Agent');
+<<<<<<< HEAD
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [responseStats, setResponseStats] = useState<{
@@ -36,6 +44,9 @@ export default function SecurityHome() {
     const respondedCount = nearbyPanics.filter(p => p.first_responder_id).length;
     console.log(`[SecurityHome] Total: ${nearbyPanics.length}, Unresponded: ${unrespondedCount}, Responded: ${respondedCount}`);
   }, [nearbyPanics]);
+=======
+  const [unreadMessages, setUnreadMessages] = useState(0);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   // ── Unread message polling (every 15 s) ───────────────────────────────────
   useEffect(() => {
@@ -91,6 +102,7 @@ export default function SecurityHome() {
   const startAlarm = async () => {
     if (alarmRef.current) return; // already playing
     try {
+<<<<<<< HEAD
       // FIX: Use centralized audio mode management to prevent clashes
       await setAlertAudioMode();
 
@@ -117,6 +129,23 @@ export default function SecurityHome() {
           { isLooping: true, volume: 1.0, shouldPlay: true }
         ));
       }
+=======
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false, // dashboard-scoped; no cross-screen bleed
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+      });
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3' },
+        { isLooping: true, volume: 1.0, shouldPlay: true }
+      ).catch(() =>
+        Audio.Sound.createAsync(
+          { uri: 'https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3' },
+          { isLooping: true, volume: 1.0, shouldPlay: true }
+        )
+      );
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       alarmRef.current = sound;
       setAlarmOn(true);
     } catch (err) {
@@ -126,26 +155,46 @@ export default function SecurityHome() {
 
   const stopAlarm = async () => {
     if (alarmRef.current) {
+<<<<<<< HEAD
       // FIX: Synchronously suppress audio BEFORE any await.
       // stopAsync/unloadAsync are async — without this instant mute the sound
       // continues playing for 100-300 ms while those Promises resolve, bleeding
       // audibly into the next screen during navigation transitions.
       alarmRef.current.setStatusAsync({ shouldPlay: false }).catch(() => {});
       setAlarmOn(false); // update UI immediately, not after async cleanup
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       try { await alarmRef.current.stopAsync(); } catch (_) {}
       try { await alarmRef.current.unloadAsync(); } catch (_) {}
       alarmRef.current = null;
     }
+<<<<<<< HEAD
     // FIX: Reset AudioSession to safe defaults — prevents audio mode bleed
     // to other screens (alarm, ambient recorder, next login). Uses centralized
     // AudioManager helper for consistent behavior across all sound sources.
     await restorePlaybackAudioMode();
     setAlarmOn(false); // idempotent — ensures UI in sync after full async chain
+=======
+    // Reset AudioSession to safe defaults — plugs the session-bleed leak.
+    // Without this reset the shared AudioSession retains whatever mode
+    // startAlarm() last configured it to, contaminating every subsequent
+    // audio caller (ambient recorder, panics screen playback, next login).
+    try {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: false,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+    } catch (_) {}
+    setAlarmOn(false);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   };
 
   const silenceAlarm = async () => {
     await stopAlarm();
     alarmSilencedRef.current = true;
+<<<<<<< HEAD
     // Track unresponded count so "new panic" detection after silence is accurate
     lastPanicCountRef.current = nearbyPanicsRef.current.filter((p: any) => !p.first_responder_id).length;
   };
@@ -166,6 +215,16 @@ export default function SecurityHome() {
     const count = unrespondedPanics.length;
     if (count === 0) {
       // All panics responded to (or none active) — disarm on this dashboard
+=======
+    lastPanicCountRef.current = nearbyPanicsRef.current.length;
+  };
+
+  // React to panic count changes — guarded by isFocusedRef so this never
+  // rings the alarm while the agent is on another screen
+  useEffect(() => {
+    const count = nearbyPanics.length;
+    if (count === 0) {
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       stopAlarm();
       alarmSilencedRef.current = false;
       lastPanicCountRef.current = 0;
@@ -173,11 +232,16 @@ export default function SecurityHome() {
     }
     const newArrived = count > lastPanicCountRef.current;
     if (newArrived) {
+<<<<<<< HEAD
       // New unresponded panic — override any existing silence so agent cannot miss it
+=======
+      // New panic — override any existing silence so agent cannot miss it
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       alarmSilencedRef.current = false;
       lastPanicCountRef.current = count;
     }
     if ((!alarmSilencedRef.current || newArrived) && isFocusedRef.current) {
+<<<<<<< HEAD
       // ALARM BLEED FIX: Defer startAlarm by one tick to let the navigation
       // transition settle.  During a transition isFocusedRef.current is still
       // true for a brief window after the user has effectively left the screen.
@@ -190,6 +254,12 @@ export default function SecurityHome() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unrespondedPanics.length]);
+=======
+      startAlarm();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nearbyPanics.length]);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   // ── Screen focus/blur — primary alarm lifecycle gate ─────────────────────
   // ON FOCUS : restart alarm if unsilenced panics exist (covers cold-start,
@@ -199,6 +269,7 @@ export default function SecurityHome() {
   useFocusEffect(
     useCallback(() => {
       isFocusedRef.current = true;
+<<<<<<< HEAD
 
       // ALARM STALE-REF FIX: Always re-fetch nearby data on focus before
       // deciding whether to (re)start the alarm. Without this, nearbyPanicsRef
@@ -211,6 +282,11 @@ export default function SecurityHome() {
       // the count-based logic decides correctly whether to start or stop the alarm.
       loadNearbyData();
 
+=======
+      if (nearbyPanicsRef.current.length > 0 && !alarmSilencedRef.current) {
+        startAlarm();
+      }
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       return () => {
         isFocusedRef.current = false;
         stopAlarm(); // also resets AudioSession — zero bleed guarantee
@@ -218,6 +294,7 @@ export default function SecurityHome() {
     }, [])
   );
 
+<<<<<<< HEAD
   // ── AppState: refresh data on foreground only if this screen is focused ──
   // With staysActiveInBackground:false the OS suspends audio when backgrounded.
   // On foreground-return we re-fetch so the stale ref cannot trigger a phantom
@@ -228,6 +305,17 @@ export default function SecurityHome() {
     const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
       if (state === 'active' && isFocusedRef.current) {
         loadNearbyData();
+=======
+  // ── AppState: restart alarm on foreground only if this screen is focused ──
+  // With staysActiveInBackground:false the OS suspends audio when backgrounded.
+  // On foreground-return the alarm must restart — but only for this screen.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state === 'active' && isFocusedRef.current) {
+        if (nearbyPanicsRef.current.length > 0 && !alarmSilencedRef.current) {
+          startAlarm();
+        }
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       }
     });
     return () => sub.remove();
@@ -248,9 +336,12 @@ export default function SecurityHome() {
         } catch (_) {}
       };
       pollUnread();
+<<<<<<< HEAD
       // Refresh response stats every time screen comes into focus so the card
       // stays accurate after the officer responds to panics on other screens.
       loadResponseStats();
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       return () => {};
     }, [])
   );
@@ -282,6 +373,7 @@ export default function SecurityHome() {
       return;
     }
 
+<<<<<<< HEAD
     // Get current user ID for "You Responded" comparison
     const metadata = await getUserMetadata();
     setCurrentUserId(metadata?.userId || null);
@@ -304,6 +396,14 @@ export default function SecurityHome() {
     } catch (_) {}
   };
 
+=======
+    await loadAgentProfile();
+    await loadTeamLocation();
+    await loadNearbyData();
+    setLoading(false);
+  };
+
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const loadAgentProfile = async () => {
     try {
       const token = await getAuthToken();
@@ -357,7 +457,10 @@ export default function SecurityHome() {
         })
       ]);
       setNearbyReports(reportsRes.data || []);
+<<<<<<< HEAD
       console.log('[loadNearbyData] Received panics:', JSON.stringify(panicsRes.data, null, 2));
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       setNearbyPanics(panicsRes.data || []);
     } catch (error: any) {
       if (error?.response?.status === 401) {
@@ -440,11 +543,17 @@ export default function SecurityHome() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
+<<<<<<< HEAD
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View>
               <Text style={styles.greeting}>Hello, Agent {agentName}</Text>
               <Text style={styles.appName}>Security Dashboard</Text>
             </View>
+=======
+          <View>
+            <Text style={styles.greeting}>Hello, Agent {agentName}</Text>
+            <Text style={styles.appName}>Security Dashboard</Text>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           </View>
           {alarmOn ? (
             <TouchableOpacity style={styles.silenceBtn} onPress={silenceAlarm}>
@@ -466,7 +575,11 @@ export default function SecurityHome() {
           >
             <Ionicons name="alarm" size={18} color="#fff" />
             <Text style={styles.alarmBannerText}>
+<<<<<<< HEAD
               🔴 {unrespondedPanics.length} ACTIVE PANIC{unrespondedPanics.length !== 1 ? 'S' : ''} — Tap to respond
+=======
+              🔴 {nearbyPanics.length} ACTIVE PANIC{nearbyPanics.length !== 1 ? 'S' : ''} — Tap to respond
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             </Text>
             <Ionicons name="chevron-forward" size={18} color="#ffffff90" />
           </TouchableOpacity>
@@ -553,6 +666,7 @@ export default function SecurityHome() {
           </View>
         </View>
 
+<<<<<<< HEAD
         {/* ── Response Time Score Card ─────────────────────────────────── */}
         {responseStats && (
           <View style={styles.statsCard}>
@@ -593,6 +707,11 @@ export default function SecurityHome() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>🚨 Nearby Panics ({nearbyPanics.length})</Text>
+=======
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>🚨 Active Panics ({nearbyPanics.length})</Text>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             <TouchableOpacity onPress={() => router.push('/security/panics')}>
               <Text style={styles.viewAll}>View All</Text>
             </TouchableOpacity>
@@ -600,6 +719,7 @@ export default function SecurityHome() {
           {nearbyPanics.length === 0 ? (
             <Text style={styles.emptyText}>No active panics nearby</Text>
           ) : (
+<<<<<<< HEAD
             nearbyPanics.slice(0, 5).map((panic: any) => {
               const isMe = panic.first_responder_id === currentUserId;
               const isOther = panic.first_responder_id && !isMe;
@@ -630,6 +750,26 @@ export default function SecurityHome() {
                 </TouchableOpacity>
               );
             })
+=======
+            nearbyPanics.slice(0, 3).map((panic: any) => (
+              <TouchableOpacity
+                key={panic.id}
+                style={styles.panicCard}
+                onPress={() => router.push('/security/panics')}
+              >
+                <View style={styles.panicCardLeft}>
+                  <Ionicons name="alert-circle" size={28} color="#EF4444" />
+                  <View>
+                    <Text style={styles.panicEmail}>{panic.user_email}</Text>
+                    <Text style={styles.panicTime}>
+                      {new Date(panic.activated_at).toLocaleTimeString()}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#64748B" />
+              </TouchableOpacity>
+            ))
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           )}
         </View>
 
@@ -674,7 +814,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0F172A' },
   scrollContent: { padding: 20 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   greeting: { fontSize: 16, color: '#94A3B8' },
   appName: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginTop: 4 },
   settingsButton: { padding: 8 },
@@ -709,13 +852,18 @@ const styles = StyleSheet.create({
   panicCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1E293B', padding: 16, borderRadius: 12, marginBottom: 12, borderLeftWidth: 4, borderLeftColor: '#EF4444' },
   panicCardLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   panicEmail: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 4 },
+<<<<<<< HEAD
   panicStatusText: { fontSize: 14, fontWeight: '600' },
+=======
+  panicTime: { fontSize: 12, color: '#94A3B8' },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   reportCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#1E293B', padding: 16, borderRadius: 12, marginBottom: 12 },
   reportInfo: { flex: 1 },
   reportType: { fontSize: 14, fontWeight: '600', color: '#fff', marginBottom: 4 },
   reportCaption: { fontSize: 12, color: '#94A3B8' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { color: '#94A3B8', marginTop: 16, fontSize: 16 },
+<<<<<<< HEAD
   // Response Time Score card
   statsCard:    { backgroundColor: '#1E293B', borderRadius: 16, padding: 16, marginBottom: 24, borderWidth: 1, borderColor: '#3B82F630' },
   statsHeader:  { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
@@ -727,4 +875,6 @@ const styles = StyleSheet.create({
   statLabel:    { fontSize: 12, color: '#94A3B8', marginTop: 2, fontWeight: '600' },
   statSub:      { fontSize: 11, color: '#475569', marginTop: 2 },
   statDivider:  { width: 1, height: 48, backgroundColor: '#334155' },
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 });

@@ -147,6 +147,10 @@ export default function PanicActive() {
     try {
       const { status: fg } = await Location.requestForegroundPermissionsAsync();
       if (fg !== 'granted') {
+<<<<<<< HEAD
+=======
+        Alert.alert('Permission Denied', 'Location permission is required.');
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         router.back();
         return;
       }
@@ -191,7 +195,11 @@ export default function PanicActive() {
             // FIX #3: Neutral title — reveals no security/emergency context
             // in the Android notification shade.
             notificationTitle: 'Se-Q',
+<<<<<<< HEAD
             notificationBody:  'Se-Q Active',
+=======
+            notificationBody:  'Location tracking active',
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           },
           pausesUpdatesAutomatically: false,
         });

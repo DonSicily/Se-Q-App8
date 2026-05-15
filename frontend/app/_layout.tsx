@@ -1,6 +1,7 @@
 /**
  * _layout.tsx — Root layout
  *
+<<<<<<< HEAD
  * AMENDMENT 5 — Silent push notifications for security ping/tracking only.
  *
  * The app is of discrete covert use. Visible system notifications (banners, sounds,
@@ -31,6 +32,26 @@
  *
  * FIX: Initialize a clean audio mode on app startup and provide a global
  * AudioManager that tracks and cleans up all active audio instances.
+=======
+ * AMENDMENT 4 — ALL push/system notifications removed.
+ *
+ * The app is of discrete covert use. Any system-level notification
+ * (banners, sounds, badges, heads-up cards) would expose the app's
+ * presence and operations to a bystander or attacker who sees the phone.
+ *
+ * THE ONLY PERMITTED NOTIFICATION is the in-app ShakeBanner that appears
+ * after the phone is shaken 5 times. This is rendered entirely within the
+ * app's own view hierarchy — it is NOT a system notification. It shows
+ * "Tap to activate / swipe away to cancel" so the user can confirm or
+ * abort the panic trigger. No push registration. No notification channels.
+ * No badge counts. No sounds from the OS notification system.
+ *
+ * Preserved behaviour:
+ *   – ShakeBanner (in-app only) ← the one allowed notification
+ *   – Native shake bridge (cold-start / foreground panic detection)
+ *   – Offline queue processor
+ *   – Role-based routing
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -41,6 +62,7 @@ import {
   TouchableOpacity, Animated, StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+<<<<<<< HEAD
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
 import { startQueueProcessor } from '../utils/offlineQueue';
@@ -49,6 +71,11 @@ import { checkAndConsumePanic } from '../utils/nativePanicBridge';
 import BACKEND_URL from '../utils/config';
 import { getAuthToken } from '../utils/auth';
 import * as Location from 'expo-location';
+=======
+import { startQueueProcessor } from '../utils/offlineQueue';
+import { useShakeDetector } from '../utils/shakeDetector';
+import { checkAndConsumePanic } from '../utils/nativePanicBridge';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 // ─── Shake Banner ─────────────────────────────────────────────────────────────
 // The ONE ALLOWED notification: an in-app banner that appears after
@@ -260,6 +287,7 @@ function AppContent() {
     return () => { queueCleanup.current?.(); queueCleanup.current = null; };
   }, []);
 
+<<<<<<< HEAD
   // ── Silent push for security ping → location transmission ────────────────
   // Configure notifications to be SILENT (no banners, sounds, or badges)
   // These notifications ONLY trigger location transmission for security tracking
@@ -317,6 +345,12 @@ function AppContent() {
       console.error('[Ping] Location transmission failed:', err);
     }
   };
+=======
+  // AMENDMENT 4: push notification listeners REMOVED entirely.
+  // Previously this section registered addNotificationReceivedListener and
+  // addNotificationResponseReceivedListener which surfaced system alerts for
+  // panic events, chat messages, and report uploads.  All of those are gone.
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   return (
     <View style={{ flex: 1 }}>
@@ -330,6 +364,7 @@ function AppContent() {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function RootLayout() {
+<<<<<<< HEAD
   // CRITICAL: Reset audio session to clean state on app startup
   // This fixes audio mode persistence that causes sound clashes after re-login
   useEffect(() => {
@@ -354,6 +389,8 @@ export default function RootLayout() {
     resetAudioSession();
   }, []);
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   return (
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor: '#0F172A' }}>

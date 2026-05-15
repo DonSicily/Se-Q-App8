@@ -121,7 +121,10 @@ export default function SecuritySettings() {
     return colors[s] || '#64748B';
   };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const StatusButton = ({ value, label, icon }: any) => (
     <TouchableOpacity
       style={[styles.statusButton, status === value && { backgroundColor: getStatusColor(value) + '30', borderColor: getStatusColor(value) }]}
@@ -153,6 +156,12 @@ export default function SecuritySettings() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Profile</Text>
           <View style={styles.profileCard}>
+<<<<<<< HEAD
+=======
+            <View style={styles.profileAvatar}>
+              <Ionicons name="shield" size={32} color="#F59E0B" />
+            </View>
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{profile?.full_name || profile?.email}</Text>
               <Text style={styles.profileRole}>
@@ -232,7 +241,10 @@ export default function SecuritySettings() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     </SafeAreaView>
   );
 }
@@ -247,6 +259,10 @@ const styles = StyleSheet.create({
   section: { padding: 20, borderBottomWidth: 1, borderBottomColor: '#1E293B' },
   sectionTitle: { fontSize: 14, color: '#64748B', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
   profileCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E293B', borderRadius: 16, padding: 16 },
+<<<<<<< HEAD
+=======
+  profileAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#F59E0B20', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   profileInfo: { flex: 1 },
   profileName: { fontSize: 18, fontWeight: '600', color: '#fff' },
   profileRole: { fontSize: 14, color: '#94A3B8', marginTop: 2 },

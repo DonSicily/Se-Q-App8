@@ -4,7 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+<<<<<<< HEAD
 import * as FileSystem from 'expo-file-system/legacy';
+=======
+import * as FileSystem from 'expo-file-system';
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 import * as Sharing from 'expo-sharing';
 import { getAuthToken, clearAuthData } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
@@ -12,7 +16,10 @@ import BACKEND_URL from '../../utils/config';
 
 type DataType = 'all' | 'panics' | 'reports' | 'users';
 type SearchField = 'all' | 'name' | 'email' | 'phone' | 'date';
+<<<<<<< HEAD
 type UserRole = 'all' | 'civil' | 'security' | 'admin';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 export default function AdminSearch() {
   const router = useRouter();
@@ -28,7 +35,10 @@ export default function AdminSearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dataType, setDataType] = useState<DataType>('all');
   const [searchField, setSearchField] = useState<SearchField>('all');
+<<<<<<< HEAD
   const [userRole, setUserRole] = useState<UserRole>('all');
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [results, setResults] = useState<any[]>([]);
@@ -55,7 +65,10 @@ export default function AdminSearch() {
           query: searchQuery,
           data_type: dataType,
           field: searchField,
+<<<<<<< HEAD
           role: userRole !== 'all' ? userRole : undefined,
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
           start_date: startDate,
           end_date: endDate
         },
@@ -156,6 +169,7 @@ export default function AdminSearch() {
   };
 
   const renderResult = ({ item }: any) => {
+<<<<<<< HEAD
     const type = item.data_type || item.type || 'unknown';
     const roleColorMap: any = {
       civil: '#10B981',
@@ -166,6 +180,13 @@ export default function AdminSearch() {
       panic: { icon: 'alert-circle', color: '#EF4444' },
       report: { icon: 'videocam', color: '#3B82F6' },
       user: { icon: 'person', color: roleColorMap[item.role] || '#10B981' },
+=======
+    const type = item.data_type || 'unknown';
+    const iconMap: any = {
+      panic: { icon: 'alert-circle', color: '#EF4444' },
+      report: { icon: 'videocam', color: '#3B82F6' },
+      user: { icon: 'person', color: '#10B981' },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     };
     const iconInfo = iconMap[type] || { icon: 'document', color: '#64748B' };
 
@@ -176,6 +197,7 @@ export default function AdminSearch() {
             <Ionicons name={iconInfo.icon} size={20} color={iconInfo.color} />
           </View>
           <View style={styles.resultInfo}>
+<<<<<<< HEAD
             <View style={styles.resultTypeRow}>
               <Text style={styles.resultType}>{type.toUpperCase()}</Text>
               {item.role && (
@@ -189,13 +211,23 @@ export default function AdminSearch() {
             <Text style={styles.resultDate}>{formatDate(item.created_at)}</Text>
           </View>
           <TouchableOpacity
+=======
+            <Text style={styles.resultType}>{type.toUpperCase()}</Text>
+            <Text style={styles.resultDate}>{formatDate(item.created_at)}</Text>
+          </View>
+          <TouchableOpacity 
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
             style={styles.deleteBtn}
             onPress={() => deleteRecord(item.id || item._id, type)}
           >
             <Ionicons name="trash" size={18} color="#EF4444" />
           </TouchableOpacity>
         </View>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         {item.full_name && (
           <Text style={styles.resultDetail}>
             <Text style={styles.resultLabel}>Name: </Text>{item.full_name}
@@ -285,6 +317,7 @@ export default function AdminSearch() {
           ))}
         </ScrollView>
 
+<<<<<<< HEAD
         {/* User Role Filter */}
         <Text style={styles.filterLabel}>User Role</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
@@ -301,6 +334,8 @@ export default function AdminSearch() {
           ))}
         </ScrollView>
 
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
         {/* Search Field Filter */}
         <Text style={styles.filterLabel}>Search Field</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
@@ -406,11 +441,16 @@ const styles = StyleSheet.create({
   resultHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   typeIcon: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   resultInfo: { flex: 1, marginLeft: 12 },
+<<<<<<< HEAD
   resultTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   resultType: { color: '#fff', fontWeight: '600', fontSize: 14 },
   resultDate: { color: '#64748B', fontSize: 12, marginTop: 2 },
   roleBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   roleBadgeText: { fontSize: 10, fontWeight: '700' },
+=======
+  resultType: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  resultDate: { color: '#64748B', fontSize: 12, marginTop: 2 },
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
   deleteBtn: { padding: 8 },
   resultDetail: { color: '#94A3B8', fontSize: 14, marginBottom: 4 },
   resultLabel: { color: '#64748B' },

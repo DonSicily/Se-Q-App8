@@ -9,7 +9,10 @@ import axios from 'axios';
 import { getAuthToken, clearAuthData } from '../../utils/auth';
 import BACKEND_URL from '../../utils/config';
 import { addToQueue, isOnline } from '../../utils/offlineQueue';
+<<<<<<< HEAD
 import { setRecordingAudioMode, restorePlaybackAudioMode } from '../../utils/AudioManager';
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 
 export default function AudioReport() {
@@ -25,13 +28,17 @@ export default function AudioReport() {
   const [recordingDuration, setRecordingDuration] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+<<<<<<< HEAD
   // Keep a ref to the active Recording so the cleanup effect can stop it
   // if the user navigates away mid-record (back button, screen switch, etc.)
   const recordingRef = useRef<Audio.Recording | null>(null);
+=======
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
   useEffect(() => {
     requestPermissions();
     return () => {
+<<<<<<< HEAD
       // ── Unmount cleanup ───────────────────────────────────────────────────
       // Stop the countdown timer
       if (timerRef.current) clearInterval(timerRef.current);
@@ -44,6 +51,9 @@ export default function AudioReport() {
           restorePlaybackAudioMode();
         });
       }
+=======
+      if (timerRef.current) clearInterval(timerRef.current);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     };
   }, []);
 
@@ -113,6 +123,7 @@ export default function AudioReport() {
 
   const startRecording = async () => {
     try {
+<<<<<<< HEAD
       // FIX: Use centralized audio mode management to prevent clashes
       await setRecordingAudioMode();
       const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
@@ -121,11 +132,23 @@ export default function AudioReport() {
       setIsRecording(true);
       setRecordingDuration(0);
 
+=======
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
+      setIsRecording(true);
+      setRecordingDuration(0);
+      
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       // Start the timer
       timerRef.current = setInterval(() => {
         setRecordingDuration(prev => prev + 1);
       }, 1000);
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
     } catch (error: any) {
       console.error('Recording error:', error);
       Alert.alert('Error', `Failed to start recording: ${error.message}`);
@@ -141,12 +164,17 @@ export default function AudioReport() {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       setIsRecording(false);
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
       setAudioUri(uri);
       setRecording(null);
+<<<<<<< HEAD
       recordingRef.current = null;
 
       // FIX: Restore audio mode to playback defaults after recording ends.
@@ -158,6 +186,11 @@ export default function AudioReport() {
       console.error('Stop recording error:', error);
       // FIX: Also restore on error path — same session-bleed risk.
       await restorePlaybackAudioMode();
+=======
+      Alert.alert('Success', `Audio recorded successfully (${formatTime(recordingDuration)})`);
+    } catch (error: any) {
+      console.error('Stop recording error:', error);
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
       Alert.alert('Error', `Failed to stop recording: ${error.message}`);
     }
   };

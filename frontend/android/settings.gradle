@@ -31,7 +31,11 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 expoAutolinking.useExpoModules()
 
+<<<<<<< HEAD
 rootProject.name = 'Se-Q'
+=======
+rootProject.name = 'SafeGuard'
+>>>>>>> 4252d71c791af1f2957fdf14e26a591ed146dfb3
 
 expoAutolinking.useExpoVersionCatalog()
 
